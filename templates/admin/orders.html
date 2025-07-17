@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Buyurtmalar boshqaruvi - Admin{% endblock %}
+
+{% block content %}
+<section class="admin-orders-section py-5">
+    <div class="container">
+        <h2 class="mb-4">Buyurtmalar boshqaruvi</h2>
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Mijoz</th>
+                        <th>Telefon</th>
+                        <th>Buyurtma</th>
+                        <th>Summa</th>
+                        <th>Holat</th>
+                        <th>Sana</th>
+                        <th>Amal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td>{{ order.id }}</td>
+                        <td>{{ order.customer_name }}</td>
+                        <td>{{ order.customer_phone }}</td>
+                        <td><pre class="mb-0 small">{{ order.items }}</pre></td>
+                        <td>{{ order.total_amount|format_number }} so'm</td>
+                        <td>
+                            <form method="POST" action="{{ url_for('admin_update_order_status', id=order.id) }}" class="d-flex align-items-center gap-2">
+                                <select name="status" class="form-select form-select-sm">
+                                    <option value="pending" {% if order.status == 'pending' %}selected{% endif %}>Kutilmoqda</option>
+                                    <option value="confirmed" {% if order.status == 'confirmed' %}selected{% endif %}>Tasdiqlangan</option>
+                                    <option value="completed" {% if order.status == 'completed' %}selected{% endif %}>Yakunlangan</option>
+                                    <option value="cancelled" {% if order.status == 'cancelled' %}selected{% endif %}>Bekor qilingan</option>
+                                </select>
+                                <button type="submit" class="btn btn-sm btn-primary">Saqlash</button>
+                            </form>
+                        </td>
+                        <td>{{ order.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
+                        <td></td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="8" class="text-center">Buyurtmalar yo‘q</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %} 

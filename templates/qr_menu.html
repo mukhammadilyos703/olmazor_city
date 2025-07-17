@@ -1,0 +1,254 @@
+{% extends "base.html" %}
+
+{% block title %}Menu - Olmazor City{% endblock %}
+
+{% block content %}
+<div class="qr-menu-page">
+    <div class="container">
+        <div class="qr-menu-header">
+            <h1 class="qr-menu-title">🍽️ Olmazor City Menu</h1>
+            <p class="qr-menu-subtitle">QR kod orqali kirish</p>
+        </div>
+        
+        <!-- Kategoriyalar -->
+        <div class="categories-section">
+            <div class="category-filters" id="categoryList">
+                <button class="category-filter active" data-category="all" type="button">
+                    <i class="fas fa-th-large me-2"></i>Hammasi
+                </button>
+                {% for category in categories %}
+                <button class="category-filter" data-category="{{ category.id }}" type="button">
+                    <span class="category-icon">{{ category.icon }}</span>
+                    {% if lang == 'ru' %}{{ category.name_ru }}{% else %}{{ category.name_uz }}{% endif %}
+                </button>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- Kategoriya bo'yicha taomlar -->
+        <div id="categoryDishes">
+            <!-- Barcha taomlar -->
+            <div class="category-dishes active" id="category-all">
+                <div class="menu-grid">
+                    {% for item in menu_items %}
+                    <div class="menu-item">
+                        {% if item.image_url %}
+                        <div class="menu-item-image">
+                            <img src="{{ url_for('static', filename=item.image_url) }}" 
+                                 alt="{{ item.name }}" 
+                                 onclick="openImageModal('{{ url_for('static', filename=item.image_url) }}', '{{ item.name }}')">
+                        </div>
+                        {% endif %}
+                        <div class="menu-item-content">
+                            <div class="menu-item-header">
+                                <h3 class="menu-item-title">{% if lang == 'ru' %}{{ item.name_ru if item.name_ru else item.name }}{% else %}{{ item.name }}{% endif %}</h3>
+                                {% if item.popular %}
+                                <span class="popular-badge">
+                                    <i class="fas fa-star"></i> Mashhur
+                                </span>
+                                {% endif %}
+                            </div>
+                            <p class="menu-item-description">{% if lang == 'ru' %}{{ item.description_ru if item.description_ru else item.description }}{% else %}{{ item.description }}{% endif %}</p>
+                            <div class="menu-item-meta">
+                                <div class="rating">
+                                    <i class="fas fa-star"></i>
+                                    <span>{{ item.rating }}</span>
+                                </div>
+                                {% if item.spice_level > 0 %}
+                                <div class="spice-level">
+                                    <i class="fas fa-fire"></i>
+                                    <span>{{ "🌶️" * item.spice_level }}</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="menu-item-price">
+                                <span class="price">{{ item.price|format_number }} so'm</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% if not menu_items %}
+                    <div class="no-items">
+                        <i class="fas fa-utensils fa-3x"></i>
+                        <h3>Hozirda taomlar yo'q</h3>
+                        <p>Tez orada qo'shiladi</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Har bir kategoriya uchun -->
+            {% for category in categories %}
+            <div class="category-dishes" id="category-{{ category.id }}">
+                <div class="category-header">
+                    <h3 class="category-title">{{ category.icon }} {% if lang == 'ru' %}{{ category.name_ru }}{% else %}{{ category.name_uz }}{% endif %}</h3>
+                </div>
+                <div class="menu-grid">
+                    {% set category_items = menu_items|selectattr('category.id', 'equalto', category.id)|list %}
+                    {% for item in category_items %}
+                    <div class="menu-item">
+                        {% if item.image_url %}
+                        <div class="menu-item-image">
+                            <img src="{{ url_for('static', filename=item.image_url) }}" 
+                                 alt="{{ item.name }}" 
+                                 onclick="openImageModal('{{ url_for('static', filename=item.image_url) }}', '{{ item.name }}')">
+                        </div>
+                        {% endif %}
+                        <div class="menu-item-content">
+                            <div class="menu-item-header">
+                                <h3 class="menu-item-title">{% if lang == 'ru' %}{{ item.name_ru if item.name_ru else item.name }}{% else %}{{ item.name }}{% endif %}</h3>
+                                {% if item.popular %}
+                                <span class="popular-badge">
+                                    <i class="fas fa-star"></i> Mashhur
+                                </span>
+                                {% endif %}
+                            </div>
+                            <p class="menu-item-description">{% if lang == 'ru' %}{{ item.description_ru if item.description_ru else item.description }}{% else %}{{ item.description }}{% endif %}</p>
+                            <div class="menu-item-meta">
+                                <div class="rating">
+                                    <i class="fas fa-star"></i>
+                                    <span>{{ item.rating }}</span>
+                                </div>
+                                {% if item.spice_level > 0 %}
+                                <div class="spice-level">
+                                    <i class="fas fa-fire"></i>
+                                    <span>{{ "🌶️" * item.spice_level }}</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="menu-item-price">
+                                <span class="price">{{ item.price|format_number }} so'm</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="no-items">
+                        <i class="fas fa-utensils fa-3x"></i>
+                        <h3>Bu kategoriyada taomlar yo'q</h3>
+                        <p>Boshqa kategoriyalarni ko'ring</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Rasm ko'rish modal -->
+<div class="modal fade" id="imageModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imageModalTitle"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="modalImage" src="" class="img-fluid" alt="">
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+  body, .qr-bg {
+    background: #111 !important;
+    color: #FFD700 !important;
+  }
+  .qr-section {
+    background: #181818;
+    border-radius: 24px;
+    box-shadow: 0 4px 32px #000a, 0 0 0 2px #FFD70022;
+    margin: 48px auto 0 auto;
+    padding: 40px 32px 48px 32px;
+    max-width: 900px;
+    position: relative;
+  }
+  .qr-title {
+    color: #FFD700;
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-shadow: 0 0 8px #FFD70077;
+    margin-bottom: 24px;
+    text-align: center;
+  }
+  .qr-img {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 24px;
+  }
+  .qr-img img {
+    border: 4px solid #FFD700;
+    border-radius: 16px;
+    box-shadow: 0 2px 16px #FFD70022;
+    background: #222;
+    padding: 12px;
+  }
+  .qr-desc {
+    color: #FFD700bb;
+    font-size: 1.1rem;
+    text-align: center;
+    margin-bottom: 12px;
+  }
+</style>
+
+<script>
+function openImageModal(imageSrc, title) {
+    document.getElementById('modalImage').src = imageSrc;
+    document.getElementById('imageModalTitle').textContent = title;
+    new bootstrap.Modal(document.getElementById('imageModal')).show();
+}
+
+// Category filtering functionality
+function showCategory(categoryId) {
+    // Update active button
+    document.querySelectorAll('.category-filter').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.getAttribute('data-category') === categoryId) {
+            btn.classList.add('active');
+        }
+    });
+    
+    // Show/hide category dishes with smooth transition
+    document.querySelectorAll('.category-dishes').forEach(div => {
+        if (div.id === 'category-' + categoryId) {
+            div.style.display = 'block';
+            div.classList.add('active');
+            // Smooth scroll to category dishes
+            setTimeout(() => {
+                div.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+        } else {
+            div.classList.remove('active');
+            div.style.display = 'none';
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const categoryButtons = document.querySelectorAll('.category-filter');
+    
+    // Add click event to all category buttons
+    categoryButtons.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault(); // Prevent any default behavior
+            const categoryId = this.getAttribute('data-category');
+            showCategory(categoryId);
+            
+            // Update URL without page reload
+            const newUrl = window.location.pathname;
+            window.history.pushState({}, '', newUrl);
+        });
+    });
+    
+    // Show "All" category by default
+    showCategory('all');
+    
+    // Handle browser back/forward buttons
+    window.addEventListener('popstate', function() {
+        showCategory('all');
+    });
+});
+</script>
+{% endblock %} 

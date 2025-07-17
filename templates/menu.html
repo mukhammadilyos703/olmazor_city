@@ -1,0 +1,383 @@
+{% extends "base.html" %}
+
+{% block title %}{% if lang == 'ru' %}Полное меню - Olmazor City{% else %}To'liq Menu - Olmazor City{% endif %}{% endblock %}
+
+{% block content %}
+<style>
+  .menu-hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 40vh;
+    background: linear-gradient(120deg, #181818 80%, #FFD70011 100%);
+    box-shadow: 0 8px 48px #000a;
+    border-bottom: 2px solid #FFD70033;
+    padding: 48px 0 24px 0;
+    position: relative;
+    z-index: 2;
+    border-radius: 0 0 32px 32px;
+  }
+  .menu-hero-logo {
+    font-size: 3rem;
+    margin-bottom: 10px;
+    text-shadow: 0 0 16px #FFD70077;
+  }
+  .menu-hero-title {
+    color: #FFD700;
+    font-size: 2.5rem;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-shadow: 0 0 16px #FFD70077, 0 2px 24px #FFD70033;
+    margin-bottom: 8px;
+  }
+  .menu-hero-subtitle {
+    color: #FFD700cc;
+    font-size: 1.2rem;
+    margin-bottom: 0;
+    font-weight: 500;
+  }
+  .category-bar {
+    background: #181818;
+    border-radius: 28px;
+    box-shadow: 0 8px 48px #000a, 0 0 0 2px #FFD70044;
+    padding: 38px 0 28px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 32px auto 0 auto;
+    max-width: 1100px;
+  }
+  .category-filters {
+    background: transparent;
+    box-shadow: none;
+    padding: 0;
+    gap: 32px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .category-filter {
+    background: #181818;
+    color: #FFD700;
+    font-weight: 700;
+    border-radius: 14px;
+    padding: 18px 40px 14px 32px;
+    font-size: 1.1rem;
+    box-shadow: 0 2px 12px #FFD70033;
+    border: 2px solid #FFD700;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+  }
+  .category-filter.active, .category-filter:hover {
+    background: #FFD700 !important;
+    color: #181818 !important;
+    box-shadow: 0 2px 24px #FFD70077;
+  }
+  .category-icon {
+    font-size: 1.3em;
+    margin-right: 6px;
+  }
+  .menu-section {
+    background: #181818;
+    border-radius: 32px;
+    box-shadow: 0 4px 32px #000a, 0 0 0 2px #FFD70022;
+    margin: 32px auto 0 auto;
+    padding: 40px 32px 48px 32px;
+    max-width: 1100px;
+    position: relative;
+  }
+  .menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+    gap: 32px;
+    margin-top: 32px;
+  }
+  .menu-item {
+    background: #181818;
+    border-radius: 18px;
+    box-shadow: 0 2px 24px #0008;
+    border: 2px solid #FFD70022;
+    padding: 24px 18px 18px 18px;
+    transition: box-shadow 0.2s, border 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .menu-item:hover {
+    box-shadow: 0 4px 32px #FFD70055;
+    border: 2px solid #FFD700;
+  }
+  .menu-item-image img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 12px;
+    border: 2px solid #FFD70033;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 12px #FFD70022;
+  }
+  .menu-item-title {
+    color: #FFD700;
+    font-size: 1.3rem;
+    font-weight: 800;
+    margin-bottom: 6px;
+    letter-spacing: 0.5px;
+  }
+  .menu-item-description {
+    color: #FFD700bb;
+    font-size: 1.05rem;
+    margin-bottom: 12px;
+    min-height: 38px;
+  }
+  .menu-item-meta {
+    display: flex;
+    gap: 18px;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .rating, .spice-level, .category-tag {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: #FFD700;
+    font-weight: 600;
+    font-size: 1.05em;
+  }
+  .popular-badge {
+    background: #FFD700;
+    color: #181818;
+    font-weight: 700;
+    border-radius: 8px;
+    padding: 2px 10px;
+    margin-left: 10px;
+    font-size: 0.98em;
+    box-shadow: 0 1px 8px #FFD70033;
+  }
+  .menu-item-price {
+    color: #FFD700;
+    font-size: 1.2rem;
+    font-weight: 800;
+    margin-top: 8px;
+    text-align: right;
+  }
+  .no-items {
+    text-align: center;
+    color: #FFD70099;
+    margin: 40px 0;
+  }
+  .no-items h3 {
+    color: #FFD700;
+    font-weight: 700;
+    margin-top: 12px;
+  }
+</style>
+
+<div class="menu-hero">
+  <div class="menu-hero-logo">🍽️</div>
+  <div class="menu-hero-title">{% if lang == 'ru' %}Полное меню{% else %}To'liq Menu{% endif %}</div>
+  <div class="menu-hero-subtitle">{% if lang == 'ru' %}Все наши блюда и напитки{% else %}Barcha taomlarimiz va ichimliklarimiz{% endif %}</div>
+</div>
+
+<div class="category-bar">
+  <div class="category-filters" id="categoryList">
+    <button class="category-filter active" data-category="all" type="button">
+      <span class="category-icon">🍽️</span>
+      {% if lang == 'ru' %}Все блюда{% else %}Barcha Taomlar{% endif %}
+    </button>
+    {% for category in categories %}
+    <button class="category-filter" data-category="{{ category.id }}" type="button">
+      <span class="category-icon">{{ category.icon }}</span>
+      {% if lang == 'ru' %}{{ category.name_ru }}{% else %}{{ category.name_uz }}{% endif %}
+    </button>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="menu-section">
+  <div id="categoryDishes">
+    <!-- Barcha taomlar -->
+    <div class="category-dishes active" id="category-all">
+      <div class="menu-grid">
+        {% for item in menu_items %}
+        <div class="menu-item">
+          {% if item.image_url %}
+          <div class="menu-item-image">
+            <img src="{{ url_for('static', filename=item.image_url) }}"
+                 alt="{{ item.name }}"
+                 onclick="openImageModal('{{ url_for('static', filename=item.image_url) }}', '{{ item.name }}')">
+          </div>
+          {% endif %}
+          <div class="menu-item-content">
+            <div class="menu-item-header">
+              <h3 class="menu-item-title">{% if lang == 'ru' %}{{ item.name_ru if item.name_ru else item.name }}{% else %}{{ item.name }}{% endif %}</h3>
+              {% if item.popular %}
+              <span class="popular-badge">
+                <i class="fas fa-star"></i> Mashhur
+              </span>
+              {% endif %}
+            </div>
+            <p class="menu-item-description">{% if lang == 'ru' %}{{ item.description_ru if item.description_ru else item.description }}{% else %}{{ item.description }}{% endif %}</p>
+            <div class="menu-item-meta">
+              <div class="rating">
+                <i class="fas fa-star"></i>
+                <span>{{ item.rating }}</span>
+              </div>
+              {% if item.spice_level > 0 %}
+              <div class="spice-level">
+                <i class="fas fa-fire"></i>
+                <span>{{ "🌶️" * item.spice_level }}</span>
+              </div>
+              {% endif %}
+              <div class="category-tag">
+                <i class="fas fa-tag"></i>
+                <span>{% if lang == 'ru' %}{{ item.category.name_ru }}{% else %}{{ item.category.name_uz }}{% endif %}</span>
+              </div>
+            </div>
+            <div class="menu-item-price">
+              <span class="price">{{ item.price|format_number }} so'm</span>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+        {% if not menu_items %}
+        <div class="no-items">
+          <i class="fas fa-utensils fa-3x"></i>
+          <h3>{% if lang == 'ru' %}Блюда пока отсутствуют{% else %}Hozirda taomlar yo'q{% endif %}</h3>
+          <p>{% if lang == 'ru' %}Скоро появятся новые блюда{% else %}Tez orada qo'shiladi{% endif %}</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    <!-- Har bir kategoriya uchun -->
+    {% for category in categories %}
+    <div class="category-dishes" id="category-{{ category.id }}">
+      <div class="category-header">
+        <h3 class="category-title">{{ category.icon }} {% if lang == 'ru' %}{{ category.name_ru }}{% else %}{{ category.name_uz }}{% endif %}</h3>
+      </div>
+      <div class="menu-grid">
+        {% set category_items = menu_items|selectattr('category.id', 'equalto', category.id)|list %}
+        {% for item in category_items %}
+        <div class="menu-item">
+          {% if item.image_url %}
+          <div class="menu-item-image">
+            <img src="{{ url_for('static', filename=item.image_url) }}"
+                 alt="{{ item.name }}"
+                 onclick="openImageModal('{{ url_for('static', filename=item.image_url) }}', '{{ item.name }}')">
+          </div>
+          {% endif %}
+          <div class="menu-item-content">
+            <div class="menu-item-header">
+              <h3 class="menu-item-title">{% if lang == 'ru' %}{{ item.name_ru if item.name_ru else item.name }}{% else %}{{ item.name }}{% endif %}</h3>
+              {% if item.popular %}
+              <span class="popular-badge">
+                <i class="fas fa-star"></i> Mashhur
+              </span>
+              {% endif %}
+            </div>
+            <p class="menu-item-description">{% if lang == 'ru' %}{{ item.description_ru if item.description_ru else item.description }}{% else %}{{ item.description }}{% endif %}</p>
+            <div class="menu-item-meta">
+              <div class="rating">
+                <i class="fas fa-star"></i>
+                <span>{{ item.rating }}</span>
+              </div>
+              {% if item.spice_level > 0 %}
+              <div class="spice-level">
+                <i class="fas fa-fire"></i>
+                <span>{{ "🌶️" * item.spice_level }}</span>
+              </div>
+              {% endif %}
+              <div class="category-tag">
+                <i class="fas fa-tag"></i>
+                <span>{% if lang == 'ru' %}{{ item.category.name_ru }}{% else %}{{ item.category.name_uz }}{% endif %}</span>
+              </div>
+            </div>
+            <div class="menu-item-price">
+              <span class="price">{{ item.price|format_number }} so'm</span>
+            </div>
+          </div>
+        </div>
+        {% else %}
+        <div class="no-items">
+          <i class="fas fa-utensils fa-3x"></i>
+          <h3>{% if lang == 'ru' %}В этой категории пока нет блюд{% else %}Bu kategoriyada taomlar yo'q{% endif %}</h3>
+          <p>{% if lang == 'ru' %}Посмотрите другие категории{% else %}Boshqa kategoriyalarni ko'ring{% endif %}</p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Rasm ko'rish modal -->
+<div class="modal fade" id="imageModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="imageModalTitle"></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body text-center">
+        <img id="modalImage" src="" class="img-fluid" alt="">
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function openImageModal(imageSrc, title) {
+    document.getElementById('modalImage').src = imageSrc;
+    document.getElementById('modalImage').alt = title;
+    document.getElementById('imageModalTitle').textContent = title;
+    new bootstrap.Modal(document.getElementById('imageModal')).show();
+}
+
+// Category filtering functionality
+function showCategory(categoryId) {
+    // Update active button
+    document.querySelectorAll('.category-filter').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.getAttribute('data-category') === categoryId) {
+            btn.classList.add('active');
+        }
+    });
+    // Show/hide category dishes with smooth transition
+    document.querySelectorAll('.category-dishes').forEach(div => {
+        if (div.id === 'category-' + categoryId) {
+            div.style.display = 'block';
+            div.classList.add('active');
+            // Smooth scroll to category dishes
+            setTimeout(() => {
+                div.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+        } else {
+            div.classList.remove('active');
+            div.style.display = 'none';
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const categoryButtons = document.querySelectorAll('.category-filter');
+    // Add click event to all category buttons
+    categoryButtons.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault(); // Prevent any default behavior
+            const categoryId = this.getAttribute('data-category');
+            showCategory(categoryId);
+            // Update URL without page reload
+            const newUrl = window.location.pathname;
+            window.history.pushState({}, '', newUrl);
+        });
+    });
+    // Show "All" category by default
+    showCategory('all');
+    // Handle browser back/forward buttons
+    window.addEventListener('popstate', function() {
+        showCategory('all');
+    });
+});
+</script>
+{% endblock %} 

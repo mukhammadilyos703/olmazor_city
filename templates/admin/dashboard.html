@@ -1,0 +1,563 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Olmazor City{% endblock %}
+
+{% block content %}
+<style>
+  body, .admin-bg {
+    background: #111 !important;
+    color: #FFD700 !important;
+    min-height: 100vh;
+  }
+  .admin-dashboard-section {
+    background: #181818;
+    border-radius: 32px;
+    box-shadow: 0 4px 32px #000a, 0 0 0 2px #FFD70022;
+    margin: 48px auto 0 auto;
+    padding: 40px 32px 48px 32px;
+    max-width: 1200px;
+    position: relative;
+  }
+  .dashboard-header {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+  .dashboard-title {
+    color: #FFD700;
+    font-size: 2.5rem;
+    font-weight: 900;
+    letter-spacing: 1.5px;
+    text-shadow: 0 0 16px #FFD70077, 0 2px 24px #FFD70033;
+    margin-bottom: 8px;
+  }
+  .dashboard-subtitle {
+    color: #FFD700bb;
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin-bottom: 18px;
+  }
+  .dashboard-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #222;
+    border-radius: 12px;
+    padding: 12px 24px;
+    box-shadow: 0 2px 12px #FFD70022;
+    margin-bottom: 32px;
+  }
+  .dashboard-info .info-item {
+    color: #FFD700;
+    font-weight: 600;
+    margin-right: 18px;
+    font-size: 1.05rem;
+  }
+  .dashboard-info a {
+    color: #FFD700;
+    font-weight: 700;
+    text-decoration: underline;
+    font-size: 1.1rem;
+    transition: color 0.2s;
+  }
+  .dashboard-info a:hover {
+    color: #fff700;
+  }
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 32px;
+    margin-bottom: 40px;
+  }
+  .stats-card {
+    background: #181818;
+    border-radius: 18px;
+    box-shadow: 0 2px 24px #FFD70022;
+    border: 2px solid #FFD70022;
+    padding: 28px 18px 18px 18px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    transition: box-shadow 0.2s, border 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .stats-card:hover {
+    box-shadow: 0 4px 32px #FFD70055;
+    border: 2px solid #FFD700;
+  }
+  .stats-icon {
+    font-size: 2.2rem;
+    color: #FFD700;
+    background: #222;
+    border-radius: 50%;
+    padding: 18px;
+    box-shadow: 0 2px 12px #FFD70022;
+    margin-right: 8px;
+  }
+  .stats-content {
+    flex: 1;
+  }
+  .stats-number {
+    color: #FFD700;
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 4px;
+  }
+  .stats-label {
+    color: #FFD700bb;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .stats-detail span {
+    color: #FFD70099;
+    font-size: 0.98em;
+    margin-right: 10px;
+  }
+  .system-status {
+    margin-bottom: 40px;
+  }
+  .system-status .section-title {
+    color: #FFD700;
+    font-size: 1.4rem;
+    font-weight: 800;
+    margin-bottom: 18px;
+    text-shadow: 0 0 8px #FFD70077;
+  }
+  .status-grid {
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .status-item {
+    background: #222;
+    border-radius: 14px;
+    box-shadow: 0 2px 12px #FFD70022;
+    padding: 18px 28px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-width: 200px;
+  }
+  .status-icon {
+    font-size: 2rem;
+    color: #FFD700;
+  }
+  .status-info h4 {
+    color: #FFD700;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 2px;
+  }
+  .status-info p {
+    color: #FFD700bb;
+    font-size: 1rem;
+    margin: 0;
+  }
+  .quick-actions {
+    margin-bottom: 40px;
+  }
+  .quick-actions .section-title {
+    color: #FFD700;
+    font-size: 1.4rem;
+    font-weight: 800;
+    margin-bottom: 18px;
+    text-shadow: 0 0 8px #FFD70077;
+  }
+  .actions-grid {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .action-card {
+    background: #181818;
+    border-radius: 14px;
+    box-shadow: 0 2px 12px #FFD70022;
+    border: 2px solid #FFD70055;
+    padding: 22px 32px;
+    color: #FFD700;
+    font-weight: 700;
+    font-size: 1.1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    transition: box-shadow 0.2s, border 0.2s, background 0.2s;
+  }
+  .action-card:hover {
+    background: #FFD700;
+    color: #181818;
+    border: 2px solid #FFD700;
+    box-shadow: 0 4px 24px #FFD70077;
+  }
+  .action-card i {
+    font-size: 1.6rem;
+    margin-bottom: 6px;
+  }
+  .action-card small {
+    color: #FFD70099;
+    font-size: 0.98em;
+    font-weight: 400;
+  }
+  .recent-section {
+    margin-bottom: 24px;
+  }
+  .recent-section .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+  }
+  .recent-section .section-title {
+    color: #FFD700;
+    font-size: 1.2rem;
+    font-weight: 800;
+    text-shadow: 0 0 8px #FFD70077;
+  }
+  .view-all-btn {
+    color: #FFD700;
+    border: 1.5px solid #FFD700;
+    border-radius: 8px;
+    padding: 8px 18px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s;
+  }
+  .view-all-btn:hover {
+    background: #FFD700;
+    color: #181818;
+  }
+  .table {
+    background: #181818;
+    color: #FFD700;
+    border-radius: 12px;
+    border: 1.5px solid #FFD70033;
+    box-shadow: 0 2px 12px #FFD70022;
+    width: 100%;
+    margin-bottom: 0;
+  }
+  .table th, .table td {
+    border-color: #FFD70033 !important;
+    color: #FFD700;
+    font-size: 1.05em;
+    padding: 10px 8px;
+    vertical-align: middle;
+  }
+  .table thead th {
+    background: #222;
+    color: #FFD700;
+    font-weight: 700;
+    border-bottom: 2px solid #FFD70055 !important;
+  }
+  .table tbody tr {
+    background: #181818;
+    transition: background 0.2s;
+  }
+  .table tbody tr:hover {
+    background: #222;
+  }
+  .status-badge {
+    background: #FFD700;
+    color: #181818;
+    border-radius: 8px;
+    padding: 4px 12px;
+    font-weight: 700;
+    font-size: 0.98em;
+    box-shadow: 0 1px 8px #FFD70033;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .action-buttons .btn-view {
+    color: #FFD700;
+    background: #222;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 1.1em;
+    transition: background 0.2s, color 0.2s;
+    text-decoration: none;
+  }
+  .action-buttons .btn-view:hover {
+    background: #FFD700;
+    color: #181818;
+  }
+  .order-id {
+    color: #FFD700;
+    font-weight: 700;
+  }
+  .item-tag {
+    background: #FFD70022;
+    color: #FFD700;
+    border-radius: 6px;
+    padding: 2px 8px;
+    margin-right: 4px;
+    font-size: 0.98em;
+  }
+  .more-items {
+    color: #FFD70099;
+    font-size: 0.98em;
+  }
+  .amount {
+    color: #FFD700;
+    font-weight: 700;
+  }
+  .customer-info strong {
+    color: #FFD700;
+  }
+  .phone-link {
+    color: #FFD700;
+    text-decoration: underline;
+  }
+  .date-info .date, .date-info .time {
+    color: #FFD700bb;
+    font-size: 0.98em;
+  }
+</style>
+
+<div class="admin-bg">
+  <section class="admin-dashboard-section">
+    <div class="dashboard-header">
+      <div class="dashboard-title">
+        <i class="fas fa-tachometer-alt me-2"></i>Admin Dashboard
+      </div>
+      <div class="dashboard-subtitle">Olmazor City boshqaruvi</div>
+      <div class="dashboard-info">
+        <div>
+          <span class="info-item">
+            <i class="fas fa-calendar me-1"></i>
+            {{ current_date }}
+          </span>
+          <span class="info-item">
+            <i class="fas fa-clock me-1"></i>
+            {{ current_time }}
+          </span>
+          <span class="info-item">
+            <i class="fas fa-user me-1"></i>
+            Admin Panel
+          </span>
+        </div>
+        <a href="{{ url_for('change_password') }}">
+          <i class="fas fa-key me-1"></i>Parolni o‘zgartirish
+        </a>
+      </div>
+    </div>
+    <div class="stats-grid">
+      <div class="stats-card">
+        <div class="stats-icon primary">
+          <i class="fas fa-utensils"></i>
+        </div>
+        <div class="stats-content">
+          <div class="stats-number">{{ total_menu_items }}</div>
+          <div class="stats-label">Jami Taomlar</div>
+          <div class="stats-detail">
+            <span class="active-count">{{ menu_items_active }} faol</span>
+            <span class="inactive-count">{{ menu_items_inactive }} nofaol</span>
+          </div>
+        </div>
+      </div>
+      <div class="stats-card">
+        <div class="stats-icon success">
+          <i class="fas fa-tags"></i>
+        </div>
+        <div class="stats-content">
+          <div class="stats-number">{{ total_categories }}</div>
+          <div class="stats-label">Kategoriyalar</div>
+          <div class="stats-detail">
+            <span class="category-info">Faol kategoriyalar</span>
+          </div>
+        </div>
+      </div>
+      <div class="stats-card">
+        <div class="stats-icon warning">
+          <i class="fas fa-shopping-cart"></i>
+        </div>
+        <div class="stats-content">
+          <div class="stats-number">{{ total_orders }}</div>
+          <div class="stats-label">Buyurtmalar</div>
+          <div class="stats-detail">
+            <span class="pending-count">{{ orders_pending }} kutilmoqda</span>
+            <span class="completed-count">{{ orders_completed }} bajarilgan</span>
+          </div>
+        </div>
+      </div>
+      <div class="stats-card">
+        <div class="stats-icon danger">
+          <i class="fas fa-eye"></i>
+        </div>
+        <div class="stats-content">
+          <div class="stats-number">{{ total_page_views }}</div>
+          <div class="stats-label">Sahifa ko'rishlar</div>
+          <div class="stats-detail">
+            <span class="today-views">{{ today_views }} bugun</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="system-status">
+      <h3 class="section-title">
+        <i class="fas fa-server me-2"></i>Tizim Holati
+      </h3>
+      <div class="status-grid">
+        <div class="status-item">
+          <i class="fas fa-database status-icon online"></i>
+          <div class="status-info">
+            <h4>Ma'lumotlar bazasi</h4>
+            <p>Online</p>
+          </div>
+        </div>
+        <div class="status-item">
+          <i class="fas fa-upload status-icon online"></i>
+          <div class="status-info">
+            <h4>Fayl yuklash</h4>
+            <p>Faol</p>
+          </div>
+        </div>
+        <div class="status-item">
+          <i class="fas fa-shield-alt status-icon online"></i>
+          <div class="status-info">
+            <h4>Xavfsizlik</h4>
+            <p>Himoyalangan</p>
+          </div>
+        </div>
+        <div class="status-item">
+          <i class="fas fa-sync status-icon online"></i>
+          <div class="status-info">
+            <h4>Sinxronlash</h4>
+            <p>Yaxshi</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="quick-actions">
+      <h3 class="section-title">
+        <i class="fas fa-bolt me-2"></i>Tezkor Amallar
+      </h3>
+      <div class="actions-grid">
+        <a href="{{ url_for('admin_add_menu') }}" class="action-card">
+          <i class="fas fa-plus"></i>
+          <span>Yangi taom qo'shish</span>
+          <small>Menu elementini qo'shish</small>
+        </a>
+        <a href="{{ url_for('admin_add_category') }}" class="action-card">
+          <i class="fas fa-folder-plus"></i>
+          <span>Yangi kategoriya</span>
+          <small>Kategoriya yaratish</small>
+        </a>
+        <a href="{{ url_for('admin_menu') }}" class="action-card">
+          <i class="fas fa-list"></i>
+          <span>Taomlarni boshqarish</span>
+          <small>Menu elementlarini tahrirlash</small>
+        </a>
+        <a href="{{ url_for('admin_categories') }}" class="action-card">
+          <i class="fas fa-tags"></i>
+          <span>Kategoriyalar</span>
+          <small>Kategoriyalarni boshqarish</small>
+        </a>
+        <a href="{{ url_for('admin_orders') }}" class="action-card">
+          <i class="fas fa-shopping-bag"></i>
+          <span>Buyurtmalar</span>
+          <small>Buyurtmalarni ko'rish</small>
+        </a>
+        <a href="{{ url_for('admin_analytics') }}" class="action-card">
+          <i class="fas fa-chart-bar"></i>
+          <span>Analitika</span>
+          <small>Statistikani ko'rish</small>
+        </a>
+      </div>
+    </div>
+    <div class="recent-section">
+      <div class="section-header">
+        <h3 class="section-title">
+          <i class="fas fa-clock me-2"></i>So'nggi Buyurtmalar
+        </h3>
+        <a href="{{ url_for('admin_orders') }}" class="view-all-btn">
+          <i class="fas fa-external-link-alt me-1"></i>Barchasini ko'rish
+        </a>
+      </div>
+      {% if recent_orders %}
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Mijoz</th>
+              <th>Telefon</th>
+              <th>Buyurtma</th>
+              <th>Summa</th>
+              <th>Holat</th>
+              <th>Sana</th>
+              <th>Amallar</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for order in recent_orders %}
+            <tr>
+              <td>
+                <span class="order-id">#{{ order.id }}</span>
+              </td>
+              <td>
+                <div class="customer-info">
+                  <strong>{{ order.customer_name or 'Anonim' }}</strong>
+                </div>
+              </td>
+              <td>
+                <a href="tel:{{ order.customer_phone }}" class="phone-link">
+                  {{ order.customer_phone or 'Kiritilmagan' }}
+                </a>
+              </td>
+              <td>
+                <div class="order-items">
+                  {% set items = order.items|from_json %}
+                  {% for item in items[:2] %}
+                    <span class="item-tag">{{ item.name }}</span>
+                  {% endfor %}
+                  {% if items|length > 2 %}
+                    <span class="more-items">+{{ items|length - 2 }} ta</span>
+                  {% endif %}
+                </div>
+              </td>
+              <td>
+                <span class="amount">{{ order.total_amount|format_number }} so'm</span>
+              </td>
+              <td>
+                <span class="status-badge status-{{ order.status }}">
+                  {% if order.status == 'completed' %}
+                    <i class="fas fa-check-circle me-1"></i>Bajarilgan
+                  {% elif order.status == 'confirmed' %}
+                    <i class="fas fa-clock me-1"></i>Tasdiqlangan
+                  {% else %}
+                    <i class="fas fa-hourglass-half me-1"></i>Kutilmoqda
+                  {% endif %}
+                </span>
+              </td>
+              <td>
+                <div class="date-info">
+                  <div class="date">{{ order.created_at.strftime('%d.%m.%Y') }}</div>
+                  <div class="time">{{ order.created_at.strftime('%H:%M') }}</div>
+                </div>
+              </td>
+              <td>
+                <div class="action-buttons">
+                  <a href="{{ url_for('admin_orders') }}?order={{ order.id }}" class="btn-view" title="Ko'rish">
+                    <i class="fas fa-eye"></i>
+                  </a>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="no-items">
+        <i class="fas fa-utensils fa-3x"></i>
+        <h3>So'nggi buyurtmalar yo'q</h3>
+      </div>
+      {% endif %}
+    </div>
+  </section>
+</div>
+{% endblock %} 

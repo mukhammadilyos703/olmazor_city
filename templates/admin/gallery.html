@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}Media boshqaruvi - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="admin-panel">
+    <div class="container">
+        <div class="admin-header">
+            <h1 class="admin-title">Media boshqaruvi</h1>
+            <a href="{{ url_for('admin_add_media') }}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Yangi media qo'shish
+            </a>
+        </div>
+        
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Choyxona manzaralari</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if media_items %}
+                        <div class="row">
+                            {% for media in media_items %}
+                            <div class="col-md-4 col-lg-3 mb-4">
+                                <div class="media-card">
+                                    {% if media.file_type == 'image' %}
+                                    <img src="{{ url_for('static', filename=media.file_url) }}" 
+                                         class="media-preview" 
+                                         alt="{{ media.title }}"
+                                         onclick="openModal('{{ url_for('static', filename=media.file_url) }}', '{{ media.title }}')">
+                                    {% else %}
+                                    <video class="media-preview" controls>
+                                        <source src="{{ url_for('static', filename=media.file_url) }}" type="video/mp4">
+                                        Brauzeringiz video formatini qo'llab-quvvatlamaydi.
+                                    </video>
+                                    {% endif %}
+                                    
+                                    <div class="media-info">
+                                        <h6 class="media-title">{{ media.title }}</h6>
+                                        {% if media.description %}
+                                        <p class="media-description">{{ media.description }}</p>
+                                        {% endif %}
+                                        <div class="media-meta">
+                                            <span class="badge bg-{{ 'primary' if media.file_type == 'image' else 'success' }}">
+                                                {{ 'Rasm' if media.file_type == 'image' else 'Video' }}
+                                            </span>
+                                            <small class="text-muted">{{ media.created_at.strftime('%d.%m.%Y') }}</small>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="media-actions">
+                                        <a href="{{ url_for('admin_delete_media', id=media.id) }}" 
+                                           class="btn btn-sm btn-danger"
+                                           onclick="return confirm('Bu media elementini o\'chirishni xohlaysizmi?')">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-images fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">Hali media elementlari qo'shilmagan</h5>
+                            <p class="text-muted">Choyxona manzaralarini ko'rsatish uchun rasm va videolar qo'shing</p>
+                            <a href="{{ url_for('admin_add_media') }}" class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i>Birinchi media qo'shish
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for image preview -->
+<div class="modal fade" id="imageModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imageModalTitle"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="modalImage" src="" class="img-fluid" alt="">
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.media-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+    background: white;
+}
+
+.media-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.media-preview {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    cursor: pointer;
+}
+
+.media-info {
+    padding: 15px;
+}
+
+.media-title {
+    margin: 0 0 8px 0;
+    font-weight: 600;
+    color: #333;
+}
+
+.media-description {
+    font-size: 14px;
+    color: #666;
+    margin: 0 0 10px 0;
+    line-height: 1.4;
+}
+
+.media-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.media-actions {
+    padding: 0 15px 15px;
+    text-align: right;
+}
+</style>
+
+<script>
+function openModal(imageSrc, title) {
+    document.getElementById('modalImage').src = imageSrc;
+    document.getElementById('imageModalTitle').textContent = title;
+    new bootstrap.Modal(document.getElementById('imageModal')).show();
+}
+</script>
+{% endblock %} 

@@ -1,0 +1,302 @@
+{% extends "base.html" %}
+
+{% block title %}Admin - Menu boshqaruvi{% endblock %}
+
+{% block content %}
+<div class="admin-panel">
+    <div class="container">
+        <div class="admin-header">
+            <h2 class="admin-title">
+                <i class="fas fa-utensils me-3"></i>Menu boshqaruvi
+            </h2>
+            <a href="{{ url_for('admin_add_menu') }}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Yangi taom qo'shish
+            </a>
+        </div>
+        
+        <div class="admin-section">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Rasm</th>
+                            <th>Nomi</th>
+                            <th>Kategoriya</th>
+                            <th>Narxi</th>
+                            <th>Baho</th>
+                            <th>Achchiqlik</th>
+                            <th>Mashhur</th>
+                            <th>Holati</th>
+                            <th>Amallar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in menu_items %}
+                        <tr>
+                            <td>{{ item.id }}</td>
+                            <td>
+                                {% if item.image_url %}
+                                    <img src="{{ url_for('static', filename=item.image_url) }}" 
+                                         alt="{{ item.name }}" 
+                                         class="admin-item-image"
+                                         onclick="showImageModal('{{ url_for('static', filename=item.image_url) }}', '{{ item.name }}')">
+                                {% else %}
+                                    <div class="no-image">
+                                        <i class="fas fa-image"></i>
+                                    </div>
+                                {% endif %}
+                            </td>
+                            <td>{{ item.name }}</td>
+                            <td>{{ item.category.name_uz }}</td>
+                            <td>{{ item.price|format_number }} so'm</td>
+                            <td>{{ item.rating }}</td>
+                            <td>
+                                {% if item.spice_level > 0 %}
+                                    <div class="spice-level">
+                                        {% for i in range(3) %}
+                                            <span class="spice-dot {% if i < item.spice_level %}active{% endif %}"></span>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if item.popular %}
+                                    <span class="badge bg-success">Ha</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Yo'q</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" 
+                                           {% if item.is_active %}checked{% endif %}
+                                           onchange="toggleItemStatus({{ item.id }}, this.checked)">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                                <span class="status-text ms-2 {% if item.is_active %}status-active{% else %}status-inactive{% endif %}">
+                                    {% if item.is_active %}Aktiv{% else %}Aktivsiz{% endif %}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a href="{{ url_for('admin_edit_menu', id=item.id) }}" class="btn btn-sm btn-warning" title="Tahrirlash">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{{ url_for('admin_delete_menu', id=item.id) }}" 
+                                       class="btn btn-sm btn-danger" 
+                                       onclick="return confirm('O\'chirishni tasdiqlaysizmi?')"
+                                       title="O'chirish">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="10" class="text-center">
+                                <div class="empty-state">
+                                    <i class="fas fa-utensils fa-3x text-muted mb-3"></i>
+                                    <h5>Taomlar yo'q</h5>
+                                    <p>Birinchi taomni qo'shing</p>
+                                    <a href="{{ url_for('admin_add_menu') }}" class="btn btn-primary">
+                                        <i class="fas fa-plus me-2"></i>Taom qo'shish
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Image Modal -->
+<div class="modal fade" id="imageModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imageModalTitle">Taom rasmi</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="modalImage" src="" alt="" class="img-fluid">
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.admin-item-image {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.admin-item-image:hover {
+    transform: scale(1.1);
+}
+
+.no-image {
+    width: 60px;
+    height: 60px;
+    background: #f8f9fa;
+    border: 2px dashed #dee2e6;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6c757d;
+}
+
+.spice-level {
+    display: flex;
+    gap: 2px;
+}
+
+.spice-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #e9ecef;
+}
+
+.spice-dot.active {
+    background: #ff6b6b;
+}
+
+.empty-state {
+    padding: 40px 20px;
+}
+
+.btn-group .btn {
+    margin-right: 5px;
+}
+
+.status-text {
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+/* Mobile responsive table */
+@media (max-width: 768px) {
+    .table-responsive {
+        font-size: 0.8rem;
+    }
+    
+    .table th,
+    .table td {
+        padding: 8px 4px;
+    }
+    
+    .admin-item-image {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .no-image {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .btn-group .btn {
+        padding: 4px 8px;
+        font-size: 0.7rem;
+    }
+    
+    .toggle-switch {
+        width: 50px;
+        height: 28px;
+    }
+    
+    .toggle-slider:before {
+        height: 20px;
+        width: 20px;
+    }
+    
+    input:checked + .toggle-slider:before {
+        transform: translateX(22px);
+    }
+    
+    .status-text {
+        display: block;
+        margin-top: 5px;
+        margin-left: 0 !important;
+    }
+}
+</style>
+
+<script>
+function showImageModal(imageSrc, title) {
+    document.getElementById('modalImage').src = imageSrc;
+    document.getElementById('modalImage').alt = title;
+    document.getElementById('imageModalTitle').textContent = title;
+    new bootstrap.Modal(document.getElementById('imageModal')).show();
+}
+
+function toggleItemStatus(itemId, isActive) {
+    fetch(`/admin/menu/toggle/${itemId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            is_active: isActive
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update status text
+            const statusText = event.target.closest('td').querySelector('.status-text');
+            if (isActive) {
+                statusText.textContent = 'Aktiv';
+                statusText.className = 'status-text ms-2 status-active';
+            } else {
+                statusText.textContent = 'Aktivsiz';
+                statusText.className = 'status-text ms-2 status-inactive';
+            }
+            
+            // Show success message
+            showAlert('Taom holati muvaffaqiyatli o\'zgartirildi!', 'success');
+        } else {
+            showAlert('Xatolik yuz berdi!', 'danger');
+            // Revert toggle
+            event.target.checked = !isActive;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showAlert('Xatolik yuz berdi!', 'danger');
+        // Revert toggle
+        event.target.checked = !isActive;
+    });
+}
+
+function showAlert(message, type) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    const container = document.querySelector('.container');
+    container.insertBefore(alertDiv, container.firstChild);
+    
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+        if (alertDiv.parentNode) {
+            alertDiv.remove();
+        }
+    }, 3000);
+}
+</script>
+{% endblock %} 

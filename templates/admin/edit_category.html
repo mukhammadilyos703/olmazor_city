@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Kategoriyani tahrirlash - Admin{% endblock %}
+
+{% block content %}
+<section class="admin-edit-category-section py-5">
+    <div class="container">
+        <h2>Kategoriyani tahrirlash</h2>
+        <form method="POST">
+            <div class="mb-3">
+                <label for="name_uz" class="form-label">Kategoriya nomi (uz)</label>
+                <input type="text" class="form-control" id="name_uz" name="name_uz" value="{{ category.name_uz }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="name_ru" class="form-label">Kategoriya nomi (ru)</label>
+                <input type="text" class="form-control" id="name_ru" name="name_ru" value="{{ category.name_ru }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="icon" class="form-label">Ikon (emoji)</label>
+                <input type="text" class="form-control" id="icon" name="icon" value="{{ category.icon }}" maxlength="2">
+            </div>
+            <button type="submit" class="btn btn-primary">Saqlash</button>
+            <a href="{{ url_for('admin_categories') }}" class="btn btn-secondary ms-2">Bekor qilish</a>
+        </form>
+    </div>
+</section>
+{% endblock %} 

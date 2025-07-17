@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block title %}Yangi media qo'shish - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="admin-panel">
+    <div class="container">
+        <div class="admin-header">
+            <h1 class="admin-title">Yangi media qo'shish</h1>
+            <a href="{{ url_for('admin_gallery') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Orqaga
+            </a>
+        </div>
+        
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-body">
+                        <form method="POST" enctype="multipart/form-data">
+                            <div class="mb-3">
+                                <label for="title" class="form-label">Sarlavha</label>
+                                <input type="text" class="form-control" id="title" name="title" required>
+                                <div class="form-text">Media elementining sarlavhasini kiriting</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Tavsif</label>
+                                <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                                <div class="form-text">Media elementining qisqacha tavsifi (ixtiyoriy)</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="file_type" class="form-label">Fayl turi</label>
+                                <select class="form-select" id="file_type" name="file_type" required onchange="updateFileInput()">
+                                    <option value="">Fayl turini tanlang</option>
+                                    <option value="image">Rasm</option>
+                                    <option value="video">Video</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="file" class="form-label">Fayl</label>
+                                <input type="file" class="form-control" id="file" name="file" required>
+                                <div class="form-text" id="fileHelp">
+                                    Rasm yoki video faylini tanlang
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <div id="filePreview" class="d-none">
+                                    <label class="form-label">Ko'rinish</label>
+                                    <div class="preview-container">
+                                        <img id="imagePreview" class="preview-image d-none" alt="Ko'rinish">
+                                        <video id="videoPreview" class="preview-video d-none" controls></video>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-upload me-2"></i>Media qo'shish
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.preview-container {
+    border: 2px dashed #e0e0e0;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    background: #f8f9fa;
+}
+
+.preview-image, .preview-video {
+    max-width: 100%;
+    max-height: 300px;
+    border-radius: 8px;
+}
+</style>
+
+<script>
+function updateFileInput() {
+    const fileType = document.getElementById('file_type').value;
+    const fileInput = document.getElementById('file');
+    const fileHelp = document.getElementById('fileHelp');
+    
+    if (fileType === 'image') {
+        fileInput.accept = 'image/*';
+        fileHelp.textContent = 'Rasm fayllari: PNG, JPG, JPEG, GIF, WEBP';
+    } else if (fileType === 'video') {
+        fileInput.accept = 'video/*';
+        fileHelp.textContent = 'Video fayllari: MP4, AVI, MOV, WMV, FLV, WEBM';
+    } else {
+        fileInput.accept = '';
+        fileHelp.textContent = 'Rasm yoki video faylini tanlang';
+    }
+}
+
+document.getElementById('file').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    const fileType = document.getElementById('file_type').value;
+    const previewContainer = document.getElementById('filePreview');
+    const imagePreview = document.getElementById('imagePreview');
+    const videoPreview = document.getElementById('videoPreview');
+    
+    if (file) {
+        previewContainer.classList.remove('d-none');
+        
+        if (fileType === 'image') {
+            imagePreview.classList.remove('d-none');
+            videoPreview.classList.add('d-none');
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                imagePreview.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        } else if (fileType === 'video') {
+            videoPreview.classList.remove('d-none');
+            imagePreview.classList.add('d-none');
+            
+            const url = URL.createObjectURL(file);
+            videoPreview.src = url;
+        }
+    } else {
+        previewContainer.classList.add('d-none');
+    }
+});
+</script>
+{% endblock %} 

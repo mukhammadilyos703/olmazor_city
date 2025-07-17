@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}Yangi taom qo'shish - Admin{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="admin-header">
+                    <h2 class="admin-title">
+                        <i class="fas fa-plus me-3"></i>Yangi taom qo'shish
+                    </h2>
+                </div>
+                
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label class="form-label">Nomi</label>
+                        <input type="text" name="name" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Tavsif</label>
+                        <textarea name="description" class="form-control" rows="3" required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Nomi (ru)</label>
+                        <input type="text" name="name_ru" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Tavsif (ru)</label>
+                        <textarea name="description_ru" class="form-control" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Rasm</label>
+                        <input type="file" name="image" class="form-control" accept="image/*">
+                        <small class="text-muted">PNG, JPG, JPEG, GIF, WEBP formatlari qo'llab-quvvatlanadi</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <button type="button" class="btn btn-outline-primary mb-3" onclick="autoTranslateToRu()">
+                            <i class="fas fa-language me-2"></i>Rus tiliga avtomatik tarjima
+                        </button>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Narxi (so'm)</label>
+                                <input type="number" name="price" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Kategoriya</label>
+                                <select name="category_id" class="form-control" required>
+                                    {% for category in categories %}
+                                    <option value="{{ category.id }}">{{ category.name_uz }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label">Baho</label>
+                                <input type="number" name="rating" step="0.1" min="0" max="5" class="form-control" value="4.5" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label">Achchiqlik</label>
+                                <select name="spice_level" class="form-control">
+                                    <option value="0">Yo'q</option>
+                                    <option value="1">O'rtacha</option>
+                                    <option value="2">Achchiq</option>
+                                    <option value="3">Juda achchiq</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <div class="form-check mt-4">
+                                    <input class="form-check-input" type="checkbox" name="popular" id="popular">
+                                    <label class="form-check-label" for="popular">Mashhur</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-end gap-3">
+                        <a href="{{ url_for('admin_menu') }}" class="btn btn-secondary">Bekor qilish</a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Saqlash
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function autoTranslateToRu() {
+    const uzName = document.querySelector('input[name="name"]').value;
+    const uzDesc = document.querySelector('textarea[name="description"]').value;
+
+    fetch('/api/translate/uz-ru', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({text: uzName})
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.querySelector('input[name="name_ru"]').value = data.translated;
+    });
+
+    fetch('/api/translate/uz-ru', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({text: uzDesc})
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.querySelector('textarea[name="description_ru"]').value = data.translated;
+    });
+}
+</script>
+{% endblock %} 

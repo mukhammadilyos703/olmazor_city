@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block title %}Taomni tahrirlash - Admin{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="admin-header">
+                    <h2 class="admin-title">
+                        <i class="fas fa-edit me-3"></i>Taomni tahrirlash
+                    </h2>
+                </div>
+                
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label class="form-label">Nomi</label>
+                        <input type="text" name="name" class="form-control" value="{{ menu_item.name }}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Tavsif</label>
+                        <textarea name="description" class="form-control" rows="3" required>{{ menu_item.description }}</textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Nomi (ru)</label>
+                        <input type="text" name="name_ru" class="form-control" value="{{ menu_item.name_ru }}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Tavsif (ru)</label>
+                        <textarea name="description_ru" class="form-control" rows="3">{{ menu_item.description_ru }}</textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Rasm</label>
+                        {% if menu_item.image_url %}
+                        <div class="current-image mb-3">
+                            <img src="{{ url_for('static', filename=menu_item.image_url) }}" 
+                                 alt="{{ menu_item.name }}" 
+                                 class="current-image-preview"
+                                 onclick="showImageModal('{{ url_for('static', filename=menu_item.image_url) }}', '{{ menu_item.name }}')">
+                            <p class="text-muted">Joriy rasm (klik qiling kattaroq ko'rish uchun)</p>
+                        </div>
+                        {% endif %}
+                        <input type="file" name="image" class="form-control" accept="image/*">
+                        <small class="text-muted">Yangi rasm tanlang (agar o'zgartirmoqchi bo'lsangiz)</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <button type="button" class="btn btn-outline-primary mb-3" onclick="autoTranslateToRu()">
+                            <i class="fas fa-language me-2"></i>Rus tiliga avtomatik tarjima
+                        </button>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Narxi (so'm)</label>
+                                <input type="number" name="price" class="form-control" value="{{ menu_item.price }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Kategoriya</label>
+                                <select name="category_id" class="form-control" required>
+                                    {% for category in categories %}
+                                    <option value="{{ category.id }}" {% if menu_item.category_id == category.id %}selected{% endif %}>{{ category.name_uz }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label">Baho</label>
+                                <input type="number" name="rating" step="0.1" min="0" max="5" class="form-control" value="{{ menu_item.rating }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label">Achchiqlik</label>
+                                <select name="spice_level" class="form-control">
+                                    <option value="0" {% if menu_item.spice_level == 0 %}selected{% endif %}>Yo'q</option>
+                                    <option value="1" {% if menu_item.spice_level == 1 %}selected{% endif %}>O'rtacha</option>
+                                    <option value="2" {% if menu_item.spice_level == 2 %}selected{% endif %}>Achchiq</option>
+                                    <option value="3" {% if menu_item.spice_level == 3 %}selected{% endif %}>Juda achchiq</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <div class="form-check mt-4">
+                                    <input class="form-check-input" type="checkbox" name="popular" id="popular" {% if menu_item.popular %}checked{% endif %}>
+                                    <label class="form-check-label" for="popular">Mashhur</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-end gap-3">
+                        <a href="{{ url_for('admin_menu') }}" class="btn btn-secondary">Bekor qilish</a>
+                        <button type="submit" class="btn btn-warning">
+                            <i class="fas fa-save me-2"></i>Saqlash
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Image Modal -->
+<div class="modal fade" id="imageModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imageModalTitle">Taom rasmi</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="modalImage" src="" alt="" class="img-fluid">
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.current-image-preview {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    border: 3px solid #e9ecef;
+}
+
+.current-image-preview:hover {
+    transform: scale(1.05);
+    border-color: #667eea;
+}
+
+.current-image {
+    text-align: center;
+}
+</style>
+
+<script>
+function showImageModal(imageSrc, title) {
+    document.getElementById('modalImage').src = imageSrc;
+    document.getElementById('modalImage').alt = title;
+    document.getElementById('imageModalTitle').textContent = title;
+    new bootstrap.Modal(document.getElementById('imageModal')).show();
+}
+</script>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function autoTranslateToRu() {
+    const uzName = document.querySelector('input[name="name"]').value;
+    const uzDesc = document.querySelector('textarea[name="description"]').value;
+
+    fetch('/api/translate/uz-ru', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({text: uzName})
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.querySelector('input[name="name_ru"]').value = data.translated;
+    });
+
+    fetch('/api/translate/uz-ru', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({text: uzDesc})
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.querySelector('textarea[name="description_ru"]').value = data.translated;
+    });
+}
+</script>
+{% endblock %} 

@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}Kategoriyalar boshqaruvi - Admin{% endblock %}
+
+{% block content %}
+<section class="admin-categories-section py-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Kategoriyalar boshqaruvi</h2>
+            <a href="{{ url_for('admin_add_category') }}" class="btn btn-success">
+                <i class="fas fa-plus me-2"></i>Yangi kategoriya qo‘shish
+            </a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Nomi (uz)</th>
+                        <th>Nomi (ru)</th>
+                        <th>Ikon</th>
+                        <th>Faol</th>
+                        <th>Amallar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for category in categories %}
+                    <tr>
+                        <td>{{ category.id }}</td>
+                        <td>{{ category.name_uz }}</td>
+                        <td>{{ category.name_ru }}</td>
+                        <td><span class="fs-3">{{ category.icon }}</span></td>
+                        <td>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="catActiveSwitch{{ category.id }}" {% if category.is_active %}checked{% endif %} onchange="toggleCategoryActive({{ category.id }}, this.checked)">
+                                <label class="form-check-label" for="catActiveSwitch{{ category.id }}">
+                                    {% if category.is_active %}Faol{% else %}No faol{% endif %}
+                                </label>
+                            </div>
+                        </td>
+                        <td>
+                            <a href="{{ url_for('admin_edit_category', id=category.id) }}" class="btn btn-warning btn-sm me-2">
+                                <i class="fas fa-edit"></i> Tahrirlash
+                            </a>
+                            <a href="#" class="btn btn-danger btn-sm" onclick="confirmDeleteCategory({{ category.id }}, '{{ category.name_uz }}')">
+                                <i class="fas fa-trash"></i> O‘chirish
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="6" class="text-center">Kategoriyalar yo‘q</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+<script>
+function confirmDeleteCategory(categoryId, categoryName) {
+    if (confirm(`"${categoryName}" kategoriyasini o‘chirishni tasdiqlaysizmi?`)) {
+        // Create and submit a form to delete
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/admin/categories/delete/${categoryId}`;
+        form.style.display = 'none';
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+function toggleCategoryActive(categoryId, isActive) {
+    fetch(`/admin/categories/toggle/${categoryId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ is_active: isActive })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (!data.success) {
+            alert('Xatolik: ' + data.message);
+        }
+    })
+    .catch(() => {
+        alert('Xatolik yuz berdi!');
+    });
+}
+</script> 

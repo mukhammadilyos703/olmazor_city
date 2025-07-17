@@ -1,0 +1,379 @@
+{% extends "base.html" %}
+
+{% block title %}QR Kod Generator - Olmazor City{% endblock %}
+
+{% block content %}
+<div class="qr-generator-page">
+    <div class="container">
+        <div class="qr-generator-header">
+            <h1 class="qr-generator-title">📱 QR Kod Generator</h1>
+            <p class="qr-generator-subtitle">Menu sahifangiz uchun QR kod yarating</p>
+        </div>
+        
+        <div class="qr-generator-content">
+            <div class="qr-form-section">
+                <div class="qr-form-card">
+                    <h3 class="form-title">
+                        <i class="fas fa-qrcode me-2"></i>QR Kod Sozlamalari
+                    </h3>
+                    
+                    <form id="qrForm" onsubmit="return generateQR(event)">
+                        <div class="form-group">
+                            <label for="qrUrl" class="form-label">Menu URL</label>
+                            <input type="url" class="form-control" id="qrUrl" 
+                                   value="{{ request.host_url }}qr-menu" 
+                                   placeholder="https://example.com/qr-menu">
+                            <small class="form-text">QR kod yaratiladigan sahifa manzili</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="qrSize" class="form-label">QR Kod o'lchami</label>
+                            <select class="form-control" id="qrSize">
+                                <option value="200">200x200 px (kichik)</option>
+                                <option value="300" selected>300x300 px (o'rta)</option>
+                                <option value="400">400x400 px (katta)</option>
+                                <option value="500">500x500 px (juda katta)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="qrColor" class="form-label">QR Kod rangi</label>
+                            <select class="form-control" id="qrColor">
+                                <option value="000000" selected>Qora</option>
+                                <option value="667eea">Ko'k</option>
+                                <option value="28a745">Yashil</option>
+                                <option value="dc3545">Qizil</option>
+                                <option value="ffc107">Sariq</option>
+                                <option value="6f42c1">Binafsha</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="qrBgColor" class="form-label">Orqa fon rangi</label>
+                            <select class="form-control" id="qrBgColor">
+                                <option value="FFFFFF" selected>Oq</option>
+                                <option value="F8F9FA">Kulrang</option>
+                                <option value="E9ECEF">To'q kulrang</option>
+                                <option value="DEE2E6">Yengil kulrang</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="qrTitle" class="form-label">Sarlavha (ixtiyoriy)</label>
+                            <input type="text" class="form-control" id="qrTitle" 
+                                   value="Olmazor City Menu" 
+                                   placeholder="QR kod ostidagi matn">
+                        </div>
+                        
+                        <button type="submit" class="generate-btn">
+                            <i class="fas fa-magic me-2"></i>QR Kod Yaratish
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="qr-result-section">
+                <div class="qr-result-card">
+                    <h3 class="result-title">
+                        <i class="fas fa-image me-2"></i>Natija
+                    </h3>
+                    
+                    <div id="qrResult" class="qr-result-display">
+                        <div class="qr-placeholder">
+                            <i class="fas fa-qrcode fa-4x"></i>
+                            <p>QR kod yaratish uchun yuqoridagi sozlamalarni to'ldiring</p>
+                        </div>
+                    </div>
+                    
+                    <div id="qrActions" class="qr-actions" style="display: none;">
+                        <button class="download-btn" onclick="downloadQR()">
+                            <i class="fas fa-download me-2"></i>Yuklab olish
+                        </button>
+                        <button class="print-btn" onclick="printQR()">
+                            <i class="fas fa-print me-2"></i>Chop etish
+                        </button>
+                        <button class="share-btn" onclick="shareQR()">
+                            <i class="fas fa-share me-2"></i>Ulashish
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="qr-info-section">
+            <div class="info-card">
+                <h4 class="info-title">
+                    <i class="fas fa-info-circle me-2"></i>QR Kod haqida
+                </h4>
+                <div class="info-content">
+                    <p><strong>QR kod nima?</strong> QR kod (Quick Response) - bu ma'lumotlarni tez o'qish uchun mo'ljallangan ikki o'lchamli kod.</p>
+                    <p><strong>Qanday ishlatish kerak?</strong></p>
+                    <ul>
+                        <li>QR kodni telefon kamerasiga yo'naltiring</li>
+                        <li>Avtomatik ravishda menu sahifasi ochiladi</li>
+                        <li>Mijozlar osonlik bilan taomlarni ko'ra oladi</li>
+                    </ul>
+                    <p><strong>Afzalliklari:</strong></p>
+                    <ul>
+                        <li>Tezkor kirish</li>
+                        <li>Xavfsiz</li>
+                        <li>Zamonaviy</li>
+                        <li>Qulay</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+  body, .qrgen-bg {
+    background: #111 !important;
+    color: #FFD700 !important;
+  }
+  .qr-generator-page {
+    padding: 40px 0;
+    background: #111 !important;
+    min-height: 100vh;
+  }
+  .qr-generator-header {
+    text-align: center;
+    margin-bottom: 40px;
+    color: #FFD700;
+  }
+  .qr-generator-title {
+    font-size: 2.2rem;
+    font-weight: 800;
+    margin-bottom: 15px;
+    text-shadow: 0 0 8px #FFD70077;
+  }
+  .qr-generator-subtitle {
+    font-size: 1.1rem;
+    color: #FFD700bb;
+    font-weight: 500;
+    margin: 0;
+  }
+  .qr-generator-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    margin-bottom: 40px;
+  }
+  .qr-form-card, .qr-result-card, .info-card {
+    background: #181818;
+    border-radius: 20px;
+    padding: 32px 28px;
+    box-shadow: 0 4px 32px #FFD70022;
+    border: 2px solid #FFD70022;
+    color: #FFD700;
+  }
+  .form-title, .result-title, .info-title {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: #FFD700;
+    margin-bottom: 18px;
+    text-align: center;
+    text-shadow: 0 0 8px #FFD70077;
+  }
+  .form-group {
+    margin-bottom: 18px;
+  }
+  .form-label {
+    font-weight: 700;
+    color: #FFD700;
+    margin-bottom: 8px;
+    display: block;
+  }
+  .form-control, select, input, textarea {
+    border-radius: 10px;
+    border: 1.5px solid #FFD70055;
+    background: #222;
+    color: #FFD700;
+    padding: 12px 18px;
+    font-weight: 600;
+    width: 100%;
+    box-shadow: none;
+  }
+  .form-control:focus {
+    border-color: #FFD700;
+    box-shadow: 0 0 0 0.2rem #FFD70033;
+    outline: none;
+  }
+  .form-text {
+    font-size: 0.9rem;
+    color: #FFD70099;
+    margin-top: 5px;
+  }
+  .generate-btn {
+    background: linear-gradient(90deg, #FFD700 60%, #bfa100 100%) !important;
+    color: #111 !important;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 10px;
+    font-weight: 800;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    width: 100%;
+    margin-top: 10px;
+    box-shadow: 0 2px 12px #FFD70033;
+  }
+  .generate-btn:hover {
+    background: linear-gradient(90deg, #fff700 60%, #FFD700 100%) !important;
+    color: #000 !important;
+  }
+  .qr-result-display {
+    text-align: center;
+    padding: 30px;
+    border: 2px dashed #FFD70055;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #FFD70099;
+    background: #222;
+  }
+  .qr-placeholder {
+    color: #FFD70099;
+  }
+  .qr-placeholder i {
+    margin-bottom: 15px;
+    color: #FFD70055;
+  }
+  .qr-actions {
+    display: flex;
+    gap: 18px;
+    justify-content: center;
+    margin-top: 12px;
+  }
+  .download-btn, .print-btn, .share-btn {
+    background: linear-gradient(90deg, #FFD700 60%, #bfa100 100%) !important;
+    color: #111 !important;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    box-shadow: 0 2px 12px #FFD70033 !important;
+    padding: 10px 22px;
+    font-size: 1rem;
+    transition: background 0.2s, color 0.2s;
+  }
+  .download-btn:hover, .print-btn:hover, .share-btn:hover {
+    background: linear-gradient(90deg, #fff700 60%, #FFD700 100%) !important;
+    color: #000 !important;
+  }
+  .qr-info-section {
+    margin-top: 32px;
+  }
+  .info-title {
+    color: #FFD700;
+    font-size: 1.15rem;
+    font-weight: 800;
+    margin-bottom: 10px;
+    text-align: left;
+  }
+  .info-content p, .info-content ul {
+    color: #FFD700bb;
+    font-size: 1.05rem;
+    margin-bottom: 8px;
+  }
+  .info-content ul {
+    padding-left: 20px;
+  }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script>
+document.getElementById('qrForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    generateQR();
+});
+
+function generateQR(e) {
+  e.preventDefault();
+  const url = document.getElementById('qrUrl').value;
+  const size = document.getElementById('qrSize').value;
+  const color = document.getElementById('qrColor').value;
+  const bg_color = document.getElementById('qrBgColor').value;
+
+  fetch('/generate-qr', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({url, size, color, bg_color})
+  })
+  .then(res => res.blob())
+  .then(blob => {
+    const imgUrl = URL.createObjectURL(blob);
+    document.getElementById('qrResult').innerHTML = `<img src="${imgUrl}" style="max-width:100%;border-radius:12px;border:2px solid #FFD700;">`;
+  });
+  return false;
+}
+
+function downloadQR() {
+    const canvas = document.querySelector('#qrResult canvas');
+    if (canvas) {
+        const link = document.createElement('a');
+        link.download = 'olmazor-city-menu-qr.png';
+        link.href = canvas.toDataURL();
+        link.click();
+    }
+}
+
+function printQR() {
+    const canvas = document.querySelector('#qrResult canvas');
+    if (canvas) {
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+            <html>
+                <head>
+                    <title>Olmazor City Menu QR Kod</title>
+                    <style>
+                        body { 
+                            margin: 0; 
+                            padding: 20px; 
+                            text-align: center; 
+                            font-family: Arial, sans-serif;
+                        }
+                        img { max-width: 100%; height: auto; }
+                        h1 { color: #2c3e50; margin-bottom: 20px; }
+                    </style>
+                </head>
+                <body>
+                    <h1>Olmazor City Menu QR Kod</h1>
+                    <img src="${canvas.toDataURL()}" alt="QR Kod">
+                    <p>QR kodni telefon kamerasiga yo'naltiring</p>
+                </body>
+            </html>
+        `);
+        printWindow.document.close();
+        printWindow.print();
+    }
+}
+
+function shareQR() {
+    const canvas = document.querySelector('#qrResult canvas');
+    if (canvas && navigator.share) {
+        canvas.toBlob(function(blob) {
+            const file = new File([blob], 'qr-code.png', { type: 'image/png' });
+            navigator.share({
+                title: 'Olmazor City Menu QR Kod',
+                text: 'Menu sahifamizga kirish uchun QR kod',
+                files: [file]
+            });
+        });
+    } else {
+        // Fallback - URL nusxalash
+        const url = document.getElementById('qrUrl').value;
+        navigator.clipboard.writeText(url).then(function() {
+            alert('URL nusxalandi!');
+        });
+    }
+}
+
+// Sahifa yuklanganda avtomatik QR kod yaratish
+window.addEventListener('load', function() {
+    setTimeout(generateQR, 1000);
+});
+</script>
+{% endblock %} 
