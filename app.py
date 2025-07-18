@@ -10,6 +10,19 @@ import qrcode
 import io
 from flask import send_file
 
+from datetime import datetime, timedelta
+import json
+import xlsxwriter
+from io import BytesIO
+import matplotlib.pyplot as plt
+import seaborn as sns
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+from reportlab.lib import colors
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.images import Image
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'olmazor-city-secret-key-2024'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///restaurant.db'
@@ -69,6 +82,20 @@ class PageView(db.Model):
     ip_address = db.Column(db.String(45))
     user_agent = db.Column(db.Text)
     viewed_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+class SecuritySetting(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), unique=True, nullable=False)
+    enabled = db.Column(db.Boolean, default=False)
+    config = db.Column(db.JSON)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+class LoginAttempt(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), nullable=False)
+    ip_address = db.Column(db.String(45))
+    success = db.Column(db.Boolean, default=False)
+    attempted_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 # Authentication decorators
 def login_required(f):
@@ -162,18 +189,333 @@ def qr_generator():
     track_page_view('qr_generator')
     return render_template('qr_generator.html')
 
+@app.route('/api/stats/detailed/<type>')
+@admin_required
+def get_detailed_stats(type):
+    if type == 'menu':
+        # Get menu items statistics
+        total = MenuItem.query.count()
+        active = MenuItem.query.filter_by(is_active=True).count()
+        inactive = MenuItem.query.filter_by(is_active=False).count()
+        popular = MenuItem.query.filter_by(popular=True).count()
+        by_category = db.session.query(
+            Category.name_uz,
+            db.func.count(MenuItem.id)
+        ).join(MenuItem).group_by(Category.id).all()
+        
+        return jsonify({
+            'total': total,
+            'active': active,
+            'inactive': inactive,
+            'popular': popular,
+            'by_category': dict(by_category)
+        })
+    
+    elif type == 'orders':
+        # Get orders statistics
+        total = Order.query.count()
+        pending = Order.query.filter_by(status='pending').count()
+        completed = Order.query.filter_by(status='completed').count()
+        cancelled = Order.query.filter_by(status='cancelled').count()
+        
+        # Get daily orders for the last 7 days
+        daily_orders = []
+        for i in range(7):
+            date = datetime.now().date() - timedelta(days=i)
+            count = Order.query.filter(
+                db.func.date(Order.created_at) == date
+            ).count()
+            daily_orders.append({
+                'date': date.strftime('%Y-%m-%d'),
+                'count': count
+            })
+        
+        return jsonify({
+            'total': total,
+            'pending': pending,
+            'completed': completed,
+            'cancelled': cancelled,
+            'daily_orders': daily_orders
+        })
+    
+    elif type == 'views':
+        # Get page views statistics
+        total = PageView.query.count()
+        today = PageView.query.filter(
+            db.func.date(PageView.viewed_at) == datetime.now().date()
+        ).count()
+        
+        # Get daily views for the last 7 days
+        daily_views = []
+        for i in range(7):
+            date = datetime.now().date() - timedelta(days=i)
+            count = PageView.query.filter(
+                db.func.date(PageView.viewed_at) == date
+            ).count()
+            daily_views.append({
+                'date': date.strftime('%Y-%m-%d'),
+                'count': count
+            })
+        
+        # Get views by page
+        by_page = db.session.query(
+            PageView.page,
+            db.func.count(PageView.id)
+        ).group_by(PageView.page).all()
+        
+        return jsonify({
+            'total': total,
+            'today': today,
+            'daily_views': daily_views,
+            'by_page': dict(by_page)
+        })
+    
+    return jsonify({'error': 'Invalid type'})
+
+@app.route('/api/export/<type>')
+@admin_required
+def export_report(type):
+    if type == 'orders':
+        # Create Excel file
+        output = BytesIO()
+        workbook = xlsxwriter.Workbook(output)
+        worksheet = workbook.add_worksheet()
+        
+        # Add headers
+        headers = ['ID', 'Customer', 'Phone', 'Items', 'Total', 'Status', 'Created At']
+        for col, header in enumerate(headers):
+            worksheet.write(0, col, header)
+        
+        # Add data
+        orders = Order.query.all()
+        for row, order in enumerate(orders, start=1):
+            worksheet.write(row, 0, order.id)
+            worksheet.write(row, 1, order.customer_name)
+            worksheet.write(row, 2, order.customer_phone)
+            worksheet.write(row, 3, order.items)
+            worksheet.write(row, 4, order.total_amount)
+            worksheet.write(row, 5, order.status)
+            worksheet.write(row, 6, order.created_at.strftime('%Y-%m-%d %H:%M'))
+        
+        workbook.close()
+        output.seek(0)
+        
+        return send_file(
+            output,
+            mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            as_attachment=True,
+            download_name='orders_report.xlsx'
+        )
+    
+    elif type == 'sales':
+        # Create PDF report
+        buffer = BytesIO()
+        doc = SimpleDocTemplate(buffer, pagesize=letter)
+        elements = []
+        
+        # Add title
+        styles = getSampleStyleSheet()
+        elements.append(Paragraph('Sales Report', styles['Title']))
+        
+        # Add sales data
+        orders = Order.query.filter_by(status='completed').all()
+        data = [['Date', 'Orders', 'Total Sales']]
+        
+        # Group by date
+        sales_by_date = {}
+        for order in orders:
+            date = order.created_at.date()
+            if date not in sales_by_date:
+                sales_by_date[date] = {'count': 0, 'total': 0}
+            sales_by_date[date]['count'] += 1
+            sales_by_date[date]['total'] += order.total_amount
+        
+        # Add to table
+        for date, stats in sorted(sales_by_date.items()):
+            data.append([
+                date.strftime('%Y-%m-%d'),
+                stats['count'],
+                f"{stats['total']:,.0f} so'm"
+            ])
+        
+        # Create table
+        table = Table(data)
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 14),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+            ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
+            ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 1), (-1, -1), 12),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black)
+        ]))
+        elements.append(table)
+        
+        # Build PDF
+        doc.build(elements)
+        buffer.seek(0)
+        
+        return send_file(
+            buffer,
+            mimetype='application/pdf',
+            as_attachment=True,
+            download_name='sales_report.pdf'
+        )
+    
+    elif type == 'analytics':
+        # Create PDF analytics report
+        buffer = BytesIO()
+        doc = SimpleDocTemplate(buffer, pagesize=letter)
+        elements = []
+        
+        # Add title
+        styles = getSampleStyleSheet()
+        elements.append(Paragraph('Analytics Report', styles['Title']))
+        
+        # Add various statistics
+        stats = [
+            ('Total Menu Items', MenuItem.query.count()),
+            ('Active Menu Items', MenuItem.query.filter_by(is_active=True).count()),
+            ('Total Categories', Category.query.count()),
+            ('Total Orders', Order.query.count()),
+            ('Completed Orders', Order.query.filter_by(status='completed').count()),
+            ('Total Page Views', PageView.query.count())
+        ]
+        
+        data = [['Metric', 'Value']]
+        for metric, value in stats:
+            data.append([metric, value])
+        
+        # Create table
+        table = Table(data)
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 14),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+            ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
+            ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 1), (-1, -1), 12),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black)
+        ]))
+        elements.append(table)
+        
+        # Add some charts
+        # Orders by status
+        plt.figure(figsize=(8, 6))
+        orders_by_status = {
+            'Pending': Order.query.filter_by(status='pending').count(),
+            'Completed': Order.query.filter_by(status='completed').count(),
+            'Cancelled': Order.query.filter_by(status='cancelled').count()
+        }
+        plt.pie(
+            orders_by_status.values(),
+            labels=orders_by_status.keys(),
+            autopct='%1.1f%%'
+        )
+        plt.title('Orders by Status')
+        
+        # Save chart to buffer
+        chart_buffer = BytesIO()
+        plt.savefig(chart_buffer, format='png')
+        chart_buffer.seek(0)
+        
+        # Add chart to PDF
+        elements.append(Image(chart_buffer))
+        
+        # Build PDF
+        doc.build(elements)
+        buffer.seek(0)
+        
+        return send_file(
+            buffer,
+            mimetype='application/pdf',
+            as_attachment=True,
+            download_name='analytics_report.pdf'
+        )
+    
+    return jsonify({'error': 'Invalid type'})
+
+@app.route('/api/security/update', methods=['POST'])
+@admin_required
+def update_security():
+    data = request.get_json()
+    setting = data.get('setting')
+    enabled = data.get('enabled')
+    
+    if not setting:
+        return jsonify({'error': 'Setting name required'}), 400
+    
+    security_setting = SecuritySetting.query.filter_by(name=setting).first()
+    if not security_setting:
+        security_setting = SecuritySetting(name=setting)
+    
+    security_setting.enabled = enabled
+    security_setting.updated_at = datetime.utcnow()
+    
+    db.session.add(security_setting)
+    db.session.commit()
+    
+    return jsonify({'success': True})
+
+@app.route('/api/security/status')
+@admin_required
+def get_security_status():
+    settings = SecuritySetting.query.all()
+    return jsonify({
+        setting.name: setting.enabled for setting in settings
+    })
+
+# Login attempt tracking
+def track_login_attempt(username, success, ip_address):
+    attempt = LoginAttempt(
+        username=username,
+        success=success,
+        ip_address=ip_address
+    )
+    db.session.add(attempt)
+    db.session.commit()
+
+# Modified login route with attempt tracking
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        user = User.query.filter_by(username=username).first()
         
+        # Check if login attempts are enabled and if user is blocked
+        login_attempts_setting = SecuritySetting.query.filter_by(name='login_attempts').first()
+        if login_attempts_setting and login_attempts_setting.enabled:
+            # Count failed attempts in last hour
+            hour_ago = datetime.utcnow() - timedelta(hours=1)
+            failed_attempts = LoginAttempt.query.filter_by(
+                username=username,
+                success=False,
+                attempted_at > hour_ago
+            ).count()
+            
+            if failed_attempts >= 5:
+                track_login_attempt(username, False, request.remote_addr)
+                flash('Too many failed attempts. Please try again later.', 'danger')
+                return redirect(url_for('login'))
+        
+        user = User.query.filter_by(username=username).first()
         if user and check_password_hash(user.password_hash, password):
             session['user_id'] = user.id
+            track_login_attempt(username, True, request.remote_addr)
             flash('Muvaffaqiyatli kirildi!', 'success')
             return redirect(url_for('admin_dashboard'))
         else:
+            track_login_attempt(username, False, request.remote_addr)
             flash('Noto\'g\'ri login yoki parol!', 'danger')
     
     return render_template('login.html')

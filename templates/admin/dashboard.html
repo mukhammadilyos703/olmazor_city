@@ -315,6 +315,350 @@
     color: #FFD700bb;
     font-size: 0.98em;
   }
+
+  /* Enhanced Stats Grid */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 32px;
+    margin-bottom: 40px;
+  }
+
+  .stats-card {
+    background: #181818;
+    border-radius: 18px;
+    box-shadow: 0 2px 24px #FFD70022;
+    border: 2px solid #FFD70022;
+    padding: 28px 18px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+  }
+
+  .stats-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.1), transparent);
+    transition: left 0.5s ease;
+  }
+
+  .stats-card:hover::before {
+    left: 100%;
+  }
+
+  .stats-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 32px #FFD70055;
+    border: 2px solid #FFD700;
+  }
+
+  /* New Features Section */
+  .features-section {
+    margin: 40px 0;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 32px;
+    margin-top: 24px;
+  }
+
+  .feature-card {
+    background: #181818;
+    border-radius: 18px;
+    border: 2px solid #FFD70022;
+    padding: 24px;
+    transition: all 0.3s ease;
+  }
+
+  .feature-card:hover {
+    transform: translateY(-5px);
+    border-color: #FFD700;
+    box-shadow: 0 4px 32px #FFD70033;
+  }
+
+  .feature-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .feature-icon {
+    font-size: 24px;
+    color: #FFD700;
+    background: #222;
+    padding: 12px;
+    border-radius: 12px;
+  }
+
+  .feature-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #FFD700;
+  }
+
+  .feature-content {
+    color: #FFD700aa;
+    margin-bottom: 20px;
+  }
+
+  .feature-actions {
+    display: flex;
+    gap: 12px;
+  }
+
+  .feature-btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    flex: 1;
+    text-align: center;
+  }
+
+  .feature-btn-primary {
+    background: #FFD700;
+    color: #181818;
+  }
+
+  .feature-btn-primary:hover {
+    background: #fff700;
+    transform: translateY(-2px);
+  }
+
+  .feature-btn-secondary {
+    border: 1px solid #FFD700;
+    color: #FFD700;
+  }
+
+  .feature-btn-secondary:hover {
+    background: #FFD70011;
+    transform: translateY(-2px);
+  }
+
+  /* Charts Section */
+  .charts-section {
+    margin: 40px 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 32px;
+  }
+
+  .chart-card {
+    background: #181818;
+    border-radius: 18px;
+    border: 2px solid #FFD70022;
+    padding: 24px;
+    transition: all 0.3s ease;
+  }
+
+  .chart-card:hover {
+    border-color: #FFD700;
+    box-shadow: 0 4px 32px #FFD70033;
+  }
+
+  .chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .chart-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #FFD700;
+  }
+
+  .chart-actions {
+    display: flex;
+    gap: 12px;
+  }
+
+  .chart-period {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid #FFD70044;
+    color: #FFD700;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .chart-period:hover, .chart-period.active {
+    background: #FFD700;
+    color: #181818;
+    border-color: #FFD700;
+  }
+
+  .chart-container {
+    height: 300px;
+    position: relative;
+  }
+
+  /* Export Section */
+  .export-section {
+    margin: 40px 0;
+  }
+
+  .export-options {
+    display: flex;
+    gap: 16px;
+    margin-top: 20px;
+  }
+
+  .export-option {
+    background: #181818;
+    border: 2px solid #FFD70022;
+    border-radius: 12px;
+    padding: 16px;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .export-option:hover {
+    border-color: #FFD700;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 20px #FFD70033;
+  }
+
+  .export-icon {
+    font-size: 24px;
+    color: #FFD700;
+  }
+
+  .export-details {
+    flex: 1;
+  }
+
+  .export-title {
+    font-weight: 700;
+    color: #FFD700;
+    margin-bottom: 4px;
+  }
+
+  .export-description {
+    color: #FFD700aa;
+    font-size: 0.9rem;
+  }
+
+  /* Security Settings */
+  .security-section {
+    margin: 40px 0;
+  }
+
+  .security-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+    margin-top: 20px;
+  }
+
+  .security-option {
+    background: #181818;
+    border: 2px solid #FFD70022;
+    border-radius: 12px;
+    padding: 20px;
+    transition: all 0.3s ease;
+  }
+
+  .security-option:hover {
+    border-color: #FFD700;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 20px #FFD70033;
+  }
+
+  .security-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .security-icon {
+    font-size: 24px;
+    color: #FFD700;
+  }
+
+  .security-title {
+    font-weight: 700;
+    color: #FFD700;
+  }
+
+  .security-description {
+    color: #FFD700aa;
+    margin-bottom: 16px;
+  }
+
+  .security-control {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .security-switch {
+    position: relative;
+    width: 50px;
+    height: 26px;
+  }
+
+  .security-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .security-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #444;
+    transition: .4s;
+    border-radius: 34px;
+  }
+
+  .security-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+  }
+
+  input:checked + .security-slider {
+    background-color: #FFD700;
+  }
+
+  input:checked + .security-slider:before {
+    transform: translateX(24px);
+  }
+
+  .security-status {
+    font-weight: 600;
+    color: #FFD700;
+  }
 </style>
 
 <div class="admin-bg">
@@ -345,57 +689,189 @@
       </div>
     </div>
     <div class="stats-grid">
-      <div class="stats-card">
-        <div class="stats-icon primary">
+      <div class="stats-card" onclick="showDetailedStats('menu')">
+        <div class="stats-icon">
           <i class="fas fa-utensils"></i>
         </div>
         <div class="stats-content">
           <div class="stats-number">{{ total_menu_items }}</div>
-          <div class="stats-label">Jami Taomlar</div>
+          <div class="stats-label">Taomlar</div>
           <div class="stats-detail">
-            <span class="active-count">{{ menu_items_active }} faol</span>
-            <span class="inactive-count">{{ menu_items_inactive }} nofaol</span>
+            <span>Faol: {{ menu_items_active }}</span>
+            <span>Nofaol: {{ menu_items_inactive }}</span>
           </div>
         </div>
       </div>
-      <div class="stats-card">
-        <div class="stats-icon success">
-          <i class="fas fa-tags"></i>
+
+      <div class="stats-card" onclick="showDetailedStats('categories')">
+        <div class="stats-icon">
+          <i class="fas fa-th-large"></i>
         </div>
         <div class="stats-content">
           <div class="stats-number">{{ total_categories }}</div>
           <div class="stats-label">Kategoriyalar</div>
-          <div class="stats-detail">
-            <span class="category-info">Faol kategoriyalar</span>
-          </div>
         </div>
       </div>
-      <div class="stats-card">
-        <div class="stats-icon warning">
+
+      <div class="stats-card" onclick="showDetailedStats('orders')">
+        <div class="stats-icon">
           <i class="fas fa-shopping-cart"></i>
         </div>
         <div class="stats-content">
           <div class="stats-number">{{ total_orders }}</div>
           <div class="stats-label">Buyurtmalar</div>
           <div class="stats-detail">
-            <span class="pending-count">{{ orders_pending }} kutilmoqda</span>
-            <span class="completed-count">{{ orders_completed }} bajarilgan</span>
+            <span>Kutilmoqda: {{ orders_pending }}</span>
+            <span>Bajarildi: {{ orders_completed }}</span>
           </div>
         </div>
       </div>
-      <div class="stats-card">
-        <div class="stats-icon danger">
+
+      <div class="stats-card" onclick="showDetailedStats('views')">
+        <div class="stats-icon">
           <i class="fas fa-eye"></i>
         </div>
         <div class="stats-content">
           <div class="stats-number">{{ total_page_views }}</div>
-          <div class="stats-label">Sahifa ko'rishlar</div>
+          <div class="stats-label">Ko'rishlar</div>
           <div class="stats-detail">
-            <span class="today-views">{{ today_views }} bugun</span>
+            <span>Bugun: {{ today_views }}</span>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- Charts Section -->
+    <div class="charts-section">
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3 class="chart-title">Buyurtmalar statistikasi</h3>
+          <div class="chart-actions">
+            <button class="chart-period active">Haftalik</button>
+            <button class="chart-period">Oylik</button>
+            <button class="chart-period">Yillik</button>
+          </div>
+        </div>
+        <div class="chart-container" id="ordersChart">
+          <!-- Chart will be rendered here -->
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3 class="chart-title">Ko'rishlar statistikasi</h3>
+          <div class="chart-actions">
+            <button class="chart-period active">Haftalik</button>
+            <button class="chart-period">Oylik</button>
+            <button class="chart-period">Yillik</button>
+          </div>
+        </div>
+        <div class="chart-container" id="viewsChart">
+          <!-- Chart will be rendered here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Export Section -->
+    <div class="export-section">
+      <h3 class="section-title">Hisobotlar</h3>
+      <div class="export-options">
+        <div class="export-option" onclick="exportReport('orders')">
+          <div class="export-icon">
+            <i class="fas fa-file-excel"></i>
+          </div>
+          <div class="export-details">
+            <div class="export-title">Buyurtmalar hisoboti</div>
+            <div class="export-description">Buyurtmalar bo'yicha batafsil hisobot (Excel)</div>
+          </div>
+        </div>
+
+        <div class="export-option" onclick="exportReport('sales')">
+          <div class="export-icon">
+            <i class="fas fa-file-pdf"></i>
+          </div>
+          <div class="export-details">
+            <div class="export-title">Savdolar hisoboti</div>
+            <div class="export-description">Savdolar va daromadlar hisoboti (PDF)</div>
+          </div>
+        </div>
+
+        <div class="export-option" onclick="exportReport('analytics')">
+          <div class="export-icon">
+            <i class="fas fa-chart-bar"></i>
+          </div>
+          <div class="export-details">
+            <div class="export-title">Analitika hisoboti</div>
+            <div class="export-description">Batafsil analitika ma'lumotlari (PDF)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Security Settings -->
+    <div class="security-section">
+      <h3 class="section-title">Xavfsizlik sozlamalari</h3>
+      <div class="security-options">
+        <div class="security-option">
+          <div class="security-header">
+            <div class="security-icon">
+              <i class="fas fa-shield-alt"></i>
+            </div>
+            <div class="security-title">Login urinishlarini cheklash</div>
+          </div>
+          <div class="security-description">
+            Noto'g'ri login urinishlarini cheklash orqali tizim xavfsizligini oshiring
+          </div>
+          <div class="security-control">
+            <label class="security-switch">
+              <input type="checkbox" onchange="updateSecurity('login_attempts', this.checked)">
+              <span class="security-slider"></span>
+            </label>
+            <span class="security-status">O'chirilgan</span>
+          </div>
+        </div>
+
+        <div class="security-option">
+          <div class="security-header">
+            <div class="security-icon">
+              <i class="fas fa-key"></i>
+            </div>
+            <div class="security-title">Ikki faktorli autentifikatsiya</div>
+          </div>
+          <div class="security-description">
+            Qo'shimcha xavfsizlik uchun ikki faktorli autentifikatsiyani yoqing
+          </div>
+          <div class="security-control">
+            <label class="security-switch">
+              <input type="checkbox" onchange="updateSecurity('2fa', this.checked)">
+              <span class="security-slider"></span>
+            </label>
+            <span class="security-status">O'chirilgan</span>
+          </div>
+        </div>
+
+        <div class="security-option">
+          <div class="security-header">
+            <div class="security-icon">
+              <i class="fas fa-user-lock"></i>
+            </div>
+            <div class="security-title">Sessiya boshqaruvi</div>
+          </div>
+          <div class="security-description">
+            Faol sessiyalarni boshqarish va muddati o'tgan sessiyalarni avtomatik yopish
+          </div>
+          <div class="security-control">
+            <label class="security-switch">
+              <input type="checkbox" onchange="updateSecurity('session_management', this.checked)">
+              <span class="security-slider"></span>
+            </label>
+            <span class="security-status">O'chirilgan</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Existing Sections -->
     <div class="system-status">
       <h3 class="section-title">
         <i class="fas fa-server me-2"></i>Tizim Holati
@@ -560,4 +1036,132 @@
     </div>
   </section>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  // Refresh stats
+  function refreshStats() {
+    location.reload();
+  }
+
+  // Show detailed statistics
+  function showDetailedStats(type) {
+    // Implementation will be added
+    console.log(`Showing detailed stats for: ${type}`);
+  }
+
+  // Export reports
+  function exportReport(type) {
+    // Implementation will be added
+    console.log(`Exporting report: ${type}`);
+  }
+
+  // Update security settings
+  function updateSecurity(setting, enabled) {
+    const statusElement = event.target.parentElement.nextElementSibling;
+    statusElement.textContent = enabled ? 'Yoqilgan' : 'O\'chirilgan';
+    // Implementation will be added
+    console.log(`Updating security setting: ${setting} to ${enabled}`);
+  }
+
+  // Initialize charts
+  function initializeCharts() {
+    // Orders Chart
+    const ordersCtx = document.getElementById('ordersChart').getContext('2d');
+    new Chart(ordersCtx, {
+      type: 'line',
+      data: {
+        labels: ['Dush', 'Sesh', 'Chor', 'Pay', 'Jum', 'Shan', 'Yak'],
+        datasets: [{
+          label: 'Buyurtmalar',
+          data: [12, 19, 15, 25, 22, 30, 18],
+          borderColor: '#FFD700',
+          tension: 0.4,
+          fill: false
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            grid: {
+              color: '#FFD70022'
+            },
+            ticks: {
+              color: '#FFD700'
+            }
+          },
+          x: {
+            grid: {
+              color: '#FFD70022'
+            },
+            ticks: {
+              color: '#FFD700'
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            labels: {
+              color: '#FFD700'
+            }
+          }
+        }
+      }
+    });
+
+    // Views Chart
+    const viewsCtx = document.getElementById('viewsChart').getContext('2d');
+    new Chart(viewsCtx, {
+      type: 'bar',
+      data: {
+        labels: ['Dush', 'Sesh', 'Chor', 'Pay', 'Jum', 'Shan', 'Yak'],
+        datasets: [{
+          label: 'Ko\'rishlar',
+          data: [65, 59, 80, 81, 56, 55, 40],
+          backgroundColor: '#FFD70066',
+          borderColor: '#FFD700',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            grid: {
+              color: '#FFD70022'
+            },
+            ticks: {
+              color: '#FFD700'
+            }
+          },
+          x: {
+            grid: {
+              color: '#FFD70022'
+            },
+            ticks: {
+              color: '#FFD700'
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            labels: {
+              color: '#FFD700'
+            }
+          }
+        }
+      }
+    });
+  }
+
+  // Initialize everything when the page loads
+  document.addEventListener('DOMContentLoaded', function() {
+    initializeCharts();
+  });
+</script>
 {% endblock %} 

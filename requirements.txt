@@ -5,4 +5,7 @@ SQLAlchemy==2.0.21
 gunicorn==21.2.0
 googletrans==4.0.0rc1
 qrcode
-pillow 
+pillow
+xlsxwriter==3.2.5
+matplotlib==3.10.3
+reportlab==4.4.2 
