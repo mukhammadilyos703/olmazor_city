@@ -178,138 +178,138 @@
   <div class="menu-hero-logo">🍽️</div>
   <div class="menu-hero-title">{% if lang == 'ru' %}Полное меню{% else %}To'liq Menu{% endif %}</div>
   <div class="menu-hero-subtitle">{% if lang == 'ru' %}Все наши блюда и напитки{% else %}Barcha taomlarimiz va ichimliklarimiz{% endif %}</div>
-</div>
+    </div>
 
 <div class="category-bar">
   <div class="category-filters" id="categoryList">
     <button class="category-filter active" data-category="all" type="button">
-      <span class="category-icon">🍽️</span>
-      {% if lang == 'ru' %}Все блюда{% else %}Barcha Taomlar{% endif %}
-    </button>
-    {% for category in categories %}
+          <span class="category-icon">🍽️</span>
+          {% if lang == 'ru' %}Все блюда{% else %}Barcha Taomlar{% endif %}
+        </button>
+        {% for category in categories %}
     <button class="category-filter" data-category="{{ category.id }}" type="button">
-      <span class="category-icon">{{ category.icon }}</span>
-      {% if lang == 'ru' %}{{ category.name_ru }}{% else %}{{ category.name_uz }}{% endif %}
-    </button>
-    {% endfor %}
-  </div>
-</div>
+          <span class="category-icon">{{ category.icon }}</span>
+          {% if lang == 'ru' %}{{ category.name_ru }}{% else %}{{ category.name_uz }}{% endif %}
+        </button>
+        {% endfor %}
+      </div>
+    </div>
 
 <div class="menu-section">
-  <div id="categoryDishes">
-    <!-- Barcha taomlar -->
-    <div class="category-dishes active" id="category-all">
-      <div class="menu-grid">
-        {% for item in menu_items %}
-        <div class="menu-item">
-          {% if item.image_url %}
-          <div class="menu-item-image">
-            <img src="{{ url_for('static', filename=item.image_url) }}"
-                 alt="{{ item.name }}"
-                 onclick="openImageModal('{{ url_for('static', filename=item.image_url) }}', '{{ item.name }}')">
-          </div>
-          {% endif %}
-          <div class="menu-item-content">
-            <div class="menu-item-header">
-              <h3 class="menu-item-title">{% if lang == 'ru' %}{{ item.name_ru if item.name_ru else item.name }}{% else %}{{ item.name }}{% endif %}</h3>
-              {% if item.popular %}
-              <span class="popular-badge">
-                <i class="fas fa-star"></i> Mashhur
-              </span>
-              {% endif %}
-            </div>
-            <p class="menu-item-description">{% if lang == 'ru' %}{{ item.description_ru if item.description_ru else item.description }}{% else %}{{ item.description }}{% endif %}</p>
-            <div class="menu-item-meta">
-              <div class="rating">
-                <i class="fas fa-star"></i>
-                <span>{{ item.rating }}</span>
-              </div>
-              {% if item.spice_level > 0 %}
-              <div class="spice-level">
-                <i class="fas fa-fire"></i>
-                <span>{{ "🌶️" * item.spice_level }}</span>
+    <div id="categoryDishes">
+      <!-- Barcha taomlar -->
+      <div class="category-dishes active" id="category-all">
+        <div class="menu-grid">
+          {% for item in menu_items %}
+            <div class="menu-item">
+              {% if item.image_url %}
+              <div class="menu-item-image">
+                <img src="{{ url_for('static', filename=item.image_url) }}" 
+                     alt="{{ item.name }}" 
+                     onclick="openImageModal('{{ url_for('static', filename=item.image_url) }}', '{{ item.name }}')">
               </div>
               {% endif %}
-              <div class="category-tag">
-                <i class="fas fa-tag"></i>
-                <span>{% if lang == 'ru' %}{{ item.category.name_ru }}{% else %}{{ item.category.name_uz }}{% endif %}</span>
+              <div class="menu-item-content">
+                <div class="menu-item-header">
+                  <h3 class="menu-item-title">{% if lang == 'ru' %}{{ item.name_ru if item.name_ru else item.name }}{% else %}{{ item.name }}{% endif %}</h3>
+                  {% if item.popular %}
+                  <span class="popular-badge">
+                    <i class="fas fa-star"></i> Mashhur
+                  </span>
+                  {% endif %}
+                </div>
+                <p class="menu-item-description">{% if lang == 'ru' %}{{ item.description_ru if item.description_ru else item.description }}{% else %}{{ item.description }}{% endif %}</p>
+                <div class="menu-item-meta">
+                  <div class="rating">
+                    <i class="fas fa-star"></i>
+                    <span>{{ item.rating }}</span>
+                  </div>
+                  {% if item.spice_level > 0 %}
+                  <div class="spice-level">
+                    <i class="fas fa-fire"></i>
+                    <span>{{ "🌶️" * item.spice_level }}</span>
+                  </div>
+                  {% endif %}
+                  <div class="category-tag">
+                    <i class="fas fa-tag"></i>
+                    <span>{% if lang == 'ru' %}{{ item.category.name_ru }}{% else %}{{ item.category.name_uz }}{% endif %}</span>
+                  </div>
+                </div>
+                <div class="menu-item-price">
+                  <span class="price">{{ item.price|format_number }} so'm</span>
+                </div>
               </div>
             </div>
-            <div class="menu-item-price">
-              <span class="price">{{ item.price|format_number }} so'm</span>
-            </div>
-          </div>
-        </div>
-        {% endfor %}
-        {% if not menu_items %}
-        <div class="no-items">
-          <i class="fas fa-utensils fa-3x"></i>
+          {% endfor %}
+          {% if not menu_items %}
+            <div class="no-items">
+              <i class="fas fa-utensils fa-3x"></i>
           <h3>{% if lang == 'ru' %}Блюда пока отсутствуют{% else %}Hozirda taomlar yo'q{% endif %}</h3>
           <p>{% if lang == 'ru' %}Скоро появятся новые блюда{% else %}Tez orada qo'shiladi{% endif %}</p>
-        </div>
-        {% endif %}
-      </div>
-    </div>
-    <!-- Har bir kategoriya uchun -->
-    {% for category in categories %}
-    <div class="category-dishes" id="category-{{ category.id }}">
-      <div class="category-header">
-        <h3 class="category-title">{{ category.icon }} {% if lang == 'ru' %}{{ category.name_ru }}{% else %}{{ category.name_uz }}{% endif %}</h3>
-      </div>
-      <div class="menu-grid">
-        {% set category_items = menu_items|selectattr('category.id', 'equalto', category.id)|list %}
-        {% for item in category_items %}
-        <div class="menu-item">
-          {% if item.image_url %}
-          <div class="menu-item-image">
-            <img src="{{ url_for('static', filename=item.image_url) }}"
-                 alt="{{ item.name }}"
-                 onclick="openImageModal('{{ url_for('static', filename=item.image_url) }}', '{{ item.name }}')">
-          </div>
+            </div>
           {% endif %}
-          <div class="menu-item-content">
-            <div class="menu-item-header">
-              <h3 class="menu-item-title">{% if lang == 'ru' %}{{ item.name_ru if item.name_ru else item.name }}{% else %}{{ item.name }}{% endif %}</h3>
-              {% if item.popular %}
-              <span class="popular-badge">
-                <i class="fas fa-star"></i> Mashhur
-              </span>
-              {% endif %}
-            </div>
-            <p class="menu-item-description">{% if lang == 'ru' %}{{ item.description_ru if item.description_ru else item.description }}{% else %}{{ item.description }}{% endif %}</p>
-            <div class="menu-item-meta">
-              <div class="rating">
-                <i class="fas fa-star"></i>
-                <span>{{ item.rating }}</span>
-              </div>
-              {% if item.spice_level > 0 %}
-              <div class="spice-level">
-                <i class="fas fa-fire"></i>
-                <span>{{ "🌶️" * item.spice_level }}</span>
-              </div>
-              {% endif %}
-              <div class="category-tag">
-                <i class="fas fa-tag"></i>
-                <span>{% if lang == 'ru' %}{{ item.category.name_ru }}{% else %}{{ item.category.name_uz }}{% endif %}</span>
-              </div>
-            </div>
-            <div class="menu-item-price">
-              <span class="price">{{ item.price|format_number }} so'm</span>
-            </div>
-          </div>
         </div>
-        {% else %}
-        <div class="no-items">
-          <i class="fas fa-utensils fa-3x"></i>
+      </div>
+      <!-- Har bir kategoriya uchun -->
+      {% for category in categories %}
+      <div class="category-dishes" id="category-{{ category.id }}">
+        <div class="category-header">
+          <h3 class="category-title">{{ category.icon }} {% if lang == 'ru' %}{{ category.name_ru }}{% else %}{{ category.name_uz }}{% endif %}</h3>
+        </div>
+        <div class="menu-grid">
+          {% set category_items = menu_items|selectattr('category.id', 'equalto', category.id)|list %}
+          {% for item in category_items %}
+            <div class="menu-item">
+              {% if item.image_url %}
+              <div class="menu-item-image">
+                <img src="{{ url_for('static', filename=item.image_url) }}" 
+                     alt="{{ item.name }}" 
+                     onclick="openImageModal('{{ url_for('static', filename=item.image_url) }}', '{{ item.name }}')">
+              </div>
+              {% endif %}
+              <div class="menu-item-content">
+                <div class="menu-item-header">
+                  <h3 class="menu-item-title">{% if lang == 'ru' %}{{ item.name_ru if item.name_ru else item.name }}{% else %}{{ item.name }}{% endif %}</h3>
+                  {% if item.popular %}
+                  <span class="popular-badge">
+                    <i class="fas fa-star"></i> Mashhur
+                  </span>
+                  {% endif %}
+                </div>
+                <p class="menu-item-description">{% if lang == 'ru' %}{{ item.description_ru if item.description_ru else item.description }}{% else %}{{ item.description }}{% endif %}</p>
+                <div class="menu-item-meta">
+                  <div class="rating">
+                    <i class="fas fa-star"></i>
+                    <span>{{ item.rating }}</span>
+                  </div>
+                  {% if item.spice_level > 0 %}
+                  <div class="spice-level">
+                    <i class="fas fa-fire"></i>
+                    <span>{{ "🌶️" * item.spice_level }}</span>
+                  </div>
+                  {% endif %}
+                  <div class="category-tag">
+                    <i class="fas fa-tag"></i>
+                    <span>{% if lang == 'ru' %}{{ item.category.name_ru }}{% else %}{{ item.category.name_uz }}{% endif %}</span>
+                  </div>
+                </div>
+                <div class="menu-item-price">
+                  <span class="price">{{ item.price|format_number }} so'm</span>
+                </div>
+              </div>
+            </div>
+          {% else %}
+            <div class="no-items">
+              <i class="fas fa-utensils fa-3x"></i>
           <h3>{% if lang == 'ru' %}В этой категории пока нет блюд{% else %}Bu kategoriyada taomlar yo'q{% endif %}</h3>
           <p>{% if lang == 'ru' %}Посмотрите другие категории{% else %}Boshqa kategoriyalarni ko'ring{% endif %}</p>
+            </div>
+          {% endfor %}
         </div>
-        {% endfor %}
       </div>
+      {% endfor %}
     </div>
-    {% endfor %}
   </div>
-</div>
 
 <!-- Rasm ko'rish modal -->
 <div class="modal fade" id="imageModal" tabindex="-1">
